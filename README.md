@@ -27,20 +27,20 @@
 
 ```bash
 # 基本使用
-python assets_localizer.py input.html
+python assets_localizer.py input.html target_directory
 
-# 指定输出文件名
-python assets_localizer.py input.html output.html
+# 示例
+python assets_localizer.py index.html myProject
 ```
 
 ### Node.js版本
 
 ```bash
 # 基本使用
-node assets_localizer.js input.html
+node assets_localizer.js input.html target_directory
 
-# 指定输出文件名
-node assets_localizer.js input.html output.html
+# 示例
+node assets_localizer.js index.html myProject
 ```
 
 ## 使用示例
@@ -65,25 +65,27 @@ node assets_localizer.js input.html output.html
 运行工具后：
 
 ```bash
-python assets_localizer.py example.html
+python assets_localizer.py example.html myProject
 ```
 
 工具会：
-1. 创建 `js/` 和 `css/` 目录
+1. 在目标目录中创建 `js/` 和 `css/` 目录
 2. 下载所有外部资源到对应目录
-3. 生成 `example_local.html` 文件，其中的资源引用已更新为本地路径
+3. 将处理后的HTML文件复制到目标目录，其中的资源引用已更新为本地路径
 
 ## 输出结构
 
 ```
-项目目录/
-├── example.html              # 原始HTML文件
-├── example_local.html        # 处理后的HTML文件
+目标目录/
+├── index.html                # 处理后的HTML文件
 ├── js/                       # JavaScript文件目录
 │   ├── jquery.min.js
-│   └── bootstrap.bundle.min.js
+│   ├── bootstrap.min.js
+│   └── script_abc123.js
 └── css/                      # CSS文件目录
-    └── bootstrap.min.css
+    ├── bootstrap.min.css
+    ├── style_def456.css
+    └── main.css
 ```
 
 ## 作为模块使用
@@ -94,10 +96,10 @@ python assets_localizer.py example.html
 from assets_localizer import HTMLScriptLocalizer
 
 # 创建实例
-localizer = HTMLScriptLocalizer("input.html", "assets")
+localizer = HTMLScriptLocalizer("input.html", "target_directory")
 
 # 处理文件
-localizer.process("output.html")
+localizer.process()
 ```
 
 ### Node.js
@@ -106,17 +108,16 @@ localizer.process("output.html")
 const HTMLScriptLocalizer = require('./assets_localizer');
 
 // 创建实例
-const localizer = new HTMLScriptLocalizer('input.html', 'assets');
+const localizer = new HTMLScriptLocalizer('input.html', 'target_directory');
 
 // 处理文件
-localizer.process('output.html');
+localizer.process();
 ```
 
 ## 配置选项
 
 - `html_file_path`: 输入的HTML文件路径
-- `output_dir`: 资源文件存储目录（默认：`js`）
-- `output_html_path`: 输出的HTML文件路径（可选）
+- `target_directory`: 目标输出目录，将在此目录下创建js/css子目录和处理后的HTML文件
 
 ## 注意事项
 
