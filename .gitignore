@@ -185,6 +185,9 @@ dmypy.json
 js/
 css/
 assets/
+!/src/
+!/src/js/
+!/src/py/
 
 # Generated HTML files
 *_local.html
