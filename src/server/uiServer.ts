@@ -1,13 +1,3 @@
-/*
- * @codex 由 hongyx 使用 codex 生成
- * @file uiServer.ts
- * @summary 提供 html-assets-localizer ui 子命令的本地服务启动逻辑
- * @copyright 版权声明 厦门畅享信息技术有限公司, 版权所有 违者必究
- * @author hongyx
- * @model gpt-5-codex
- * @date 2025-10-17 12:13:00
- */
-
 import { promises as fs } from 'fs';
 import http from 'http';
 import path from 'path';

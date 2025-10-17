@@ -1,13 +1,3 @@
-/*
- * @codex 由 hongyx 使用 codex 生成
- * @file localizer.ts
- * @summary 提供 HTML 外部资源下载与路径重写的核心 TypeScript 实现
- * @copyright 版权声明 厦门畅享信息技术有限公司, 版权所有 违者必究
- * @author hongyx
- * @model gpt-5-codex
- * @date 2025-10-17 12:06:55
- */
-
 import { promises as fs } from 'fs';
 import * as path from 'path';
 import * as http from 'http';
