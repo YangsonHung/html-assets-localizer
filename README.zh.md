@@ -13,6 +13,16 @@ pnpm run build     # 编译 TypeScript 输出
 
 只要源码没有改动，通常只需编译一次即可。
 
+### 🌍 全局安装
+
+想在任何目录直接调用 CLI？
+
+```bash
+pnpm add -g html-assets-localizer
+```
+
+全局安装后，可以在任意位置使用 `html-assets-localizer`、`hal` 或 UI 子命令，无需克隆仓库。
+
 ## 🧰 CLI 模式
 
 - `html-assets-localizer <html-file> <output-dir>` —— 从 HTML 中下载并重写外链资源。

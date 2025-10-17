@@ -13,6 +13,16 @@ pnpm run build     # compile TypeScript outputs
 
 You only need to build once unless you modify the source code.
 
+### 🌍 Global Installation
+
+Want a ready-to-run CLI everywhere on your system?
+
+```bash
+pnpm add -g html-assets-localizer
+```
+
+After the global install you can invoke `html-assets-localizer`, `hal`, or the UI subcommand from any directory without cloning the repository.
+
 ## 🧰 CLI Mode
 
 - `html-assets-localizer <html-file> <output-dir>` — localize assets from an HTML file.
