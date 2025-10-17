@@ -1,16 +1,20 @@
 {
   "name": "html-assets-localizer",
-  "version": "1.1.2",
+  "version": "1.2.0",
   "description": "CLI and UI toolkit for localizing external assets in HTML documents.",
   "license": "MIT",
-  "main": "dist/index.js",
+  "main": "dist/index.cjs.js",
+  "module": "dist/index.esm.js",
+  "browser": "dist/index.umd.js",
   "types": "dist/index.d.ts",
+  "unpkg": "dist/index.umd.js",
+  "jsdelivr": "dist/index.umd.js",
   "bin": {
     "html-assets-localizer": "dist/cli.js",
     "hal": "dist/cli.js"
   },
   "scripts": {
-    "build": "tsc -p tsconfig.json",
+    "build": "tsc -p tsconfig.json && vite build && vite build --config vite.browser.config.ts",
     "start": "node dist/cli.js",
     "dev": "ts-node src/cli.ts",
     "clean": "rimraf dist",
@@ -44,6 +48,7 @@
   "dependencies": {
     "archiver": "^5.3.2",
     "express": "^4.19.2",
+    "jszip": "^3.10.1",
     "open": "^9.1.0"
   },
   "devDependencies": {
@@ -53,6 +58,7 @@
     "rimraf": "^5.0.5",
     "ts-node": "^10.9.2",
     "typescript": "^5.3.3",
+    "vite": "^7.1.10",
     "vitest": "^1.3.1"
   }
 }

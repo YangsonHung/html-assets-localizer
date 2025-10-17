@@ -184,6 +184,38 @@ for (const file of files) {
 
 ---
 
+### 4️⃣ 浏览器 UMD 模式
+
+在浏览器（包括 GitHub Pages）中直接使用，无需后端服务配合。
+
+```html
+<!-- 始终拉取最新发布的浏览器构建 -->
+<script src="https://unpkg.com/html-assets-localizer/dist/index.umd.js"></script>
+<script>
+  const { BrowserHtmlAssetsLocalizer } = window.HtmlAssetsLocalizer;
+
+  async function localizeFile(file) {
+    const htmlContent = await file.text();
+    const localizer = new BrowserHtmlAssetsLocalizer({
+      htmlContent,
+      htmlFileName: file.name,
+    });
+
+      const result = await localizer.process();
+      const url = URL.createObjectURL(result.zipBlob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = result.zipFileName;
+      link.click();
+      URL.revokeObjectURL(url);
+  }
+</script>
+```
+
+> ⚠️ 注意：浏览器模式仍受 CORS 限制，无法访问被跨域策略阻止的资源。
+
+---
+
 ## 📂 输出结构
 
 处理后的文件组织结构：
@@ -258,11 +290,7 @@ html-assets-localizer/
 
 ## 🤝 贡献
 
-欢迎提交 Issue 和 Pull Request！
-
-- 🐛 **发现 Bug**：请在 GitHub 提交 Issue
-- 💡 **功能建议**：欢迎在 Issue 中讨论
-- 🔧 **代码贡献**：Fork 项目后提交 PR
+欢迎提交 Issue 和 Pull Request！请阅读 [CONTRIBUTING.md](CONTRIBUTING.md) 了解开发流程、代码规范与提交流程。
 
 ---
 

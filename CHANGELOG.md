@@ -1,0 +1,10 @@
+# Changelog
+
+All notable changes to this project will be documented in this file.
+
+## 1.2.0 - 2025-10-17
+
+- add browser-friendly UMD bundle backed by `BrowserHtmlAssetsLocalizer`, allowing docs site and GH Pages to run localization fully in browser.
+- switch docs landing page to use the UMD bundle directly instead of the `/api/localize` backend.
+- split build targets (CJS/ESM via `vite.config.ts`, browser UMD via `vite.browser.config.ts`) and expose multiple entry fields in `package.json`.
+- document the new browser usage flow in the README and add contributor guidelines.

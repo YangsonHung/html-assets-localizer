@@ -12,6 +12,29 @@
     const resourceTableWrapper = document.getElementById('resourceTableWrapper');
     const resourceTableBody = document.querySelector('#resourceTable tbody');
 
+    const library = window.HtmlAssetsLocalizer;
+    if (!library || !library.BrowserHtmlAssetsLocalizer) {
+        if (statusContainer) {
+            statusContainer.style.display = 'block';
+        }
+        if (logOutput) {
+            const entry = document.createElement('div');
+            entry.className = 'small text-danger';
+            entry.textContent = '未能加载本地化核心脚本，请检查网络或稍后重试。';
+            logOutput.appendChild(entry);
+        }
+        console.error('BrowserHtmlAssetsLocalizer is not available on window.HtmlAssetsLocalizer.');
+        fileInput.disabled = true;
+        if (processButton) {
+            processButton.disabled = true;
+        }
+        if (resetButton) {
+            resetButton.disabled = true;
+        }
+        return;
+    }
+
+    const { BrowserHtmlAssetsLocalizer } = library;
     let selectedFile = null;
 
     fileInput.addEventListener('change', (event) => {
@@ -53,42 +76,24 @@
 
         try {
             const htmlSource = await selectedFile.text();
-            appendLog('正在请求服务器生成本地化资源...', 'info');
+            appendLog('正在解析并下载远程资源...', 'info');
 
-            const response = await fetch('/api/localize', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    fileName: selectedFile.name || 'index.html',
-                    htmlContent: htmlSource,
-                }),
+            const localizer = new BrowserHtmlAssetsLocalizer({
+                htmlContent: htmlSource,
+                htmlFileName: selectedFile.name || 'index.html',
             });
 
-            let payload = null;
-            try {
-                payload = await response.json();
-            } catch (error) {
-                payload = null;
-            }
+            const result = await localizer.process();
+            const { summary, zipBlob, zipFileName } = result;
 
-            if (!response.ok || !payload) {
-                const message = payload && payload.error ? payload.error : `服务返回状态 ${response.status}`;
-                throw new Error(message);
-            }
-
-            const { summary, zipBase64, zipName } = payload;
             appendLog(`检测到 ${summary.totalRemoteResources} 个远程资源，成功本地化 ${summary.localizedResources} 个。`, 'success');
             updateResourceTable(summary.assets || []);
 
-            const blob = base64ToBlob(zipBase64, 'application/zip');
-            const downloadName = zipName || buildDownloadFileName(selectedFile.name);
-            triggerDownload(blob, downloadName);
-            appendLog(`压缩包已生成：${downloadName}`, 'success');
+            triggerDownload(zipBlob, zipFileName);
+            appendLog(`压缩包已生成：${zipFileName}`, 'success');
 
             if (!summary.localizedResources) {
-                appendLog('未检测到需要本地化的远程资源，已返回原始 HTML。', 'warning');
+                appendLog('未检测到需要本地化的远程资源，已将原始 HTML 写入压缩包。', 'warning');
             }
         } catch (error) {
             const details = error instanceof Error ? error.message : String(error);
@@ -187,16 +192,6 @@
         }
     }
 
-    function base64ToBlob(base64, type) {
-        const binary = atob(base64);
-        const length = binary.length;
-        const bytes = new Uint8Array(length);
-        for (let i = 0; i < length; i += 1) {
-            bytes[i] = binary.charCodeAt(i);
-        }
-        return new Blob([bytes], { type });
-    }
-
     function triggerDownload(blob, fileName) {
         const url = URL.createObjectURL(blob);
         const link = document.createElement('a');
@@ -206,20 +201,6 @@
         link.click();
         document.body.removeChild(link);
         setTimeout(() => URL.revokeObjectURL(url), 2000);
-    }
-
-    function sanitizeFileName(baseName, fallback = 'file') {
-        const sanitized = (baseName || fallback)
-            .replace(/[\\/:*?"<>|]/g, '_')
-            .replace(/\s+/g, '_')
-            .slice(0, 120);
-        return sanitized || fallback;
-    }
-
-    function buildDownloadFileName(fileName) {
-        const baseName = (fileName || 'localized-page').replace(/\.[^.]+$/, '');
-        const sanitized = sanitizeFileName(baseName, 'localized-page');
-        return `${sanitized}-localized.zip`;
     }
 
     function formatBytes(bytes) {

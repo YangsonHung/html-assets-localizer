@@ -184,6 +184,39 @@ for (const file of files) {
 
 ---
 
+### 4️⃣ Browser UMD Mode
+
+Use the library directly in browsers (including GitHub Pages) without any backend.
+
+```html
+<!-- Always pulls the latest published bundle -->
+<script src="https://unpkg.com/html-assets-localizer/dist/index.umd.js"></script>
+<script>
+  const { BrowserHtmlAssetsLocalizer } = window.HtmlAssetsLocalizer;
+
+  async function localizeFile(file) {
+    const htmlContent = await file.text();
+    const localizer = new BrowserHtmlAssetsLocalizer({
+      htmlContent,
+      htmlFileName: file.name,
+    });
+
+    const result = await localizer.process();
+    // Trigger download
+    const url = URL.createObjectURL(result.zipBlob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = result.zipFileName;
+    link.click();
+    URL.revokeObjectURL(url);
+  }
+</script>
+```
+
+> ⚠️ Note: the browser mode still follows standard CORS restrictions—resources blocked by the remote server cannot be fetched.
+
+---
+
 ## 📂 Output Structure
 
 File organization after processing:
@@ -258,11 +291,7 @@ html-assets-localizer/
 
 ## 🤝 Contributing
 
-Issues and Pull Requests are welcome!
-
-- 🐛 **Found a Bug**: Please submit an Issue on GitHub
-- 💡 **Feature Suggestions**: Feel free to discuss in Issues
-- 🔧 **Code Contributions**: Fork the project and submit a PR
+Issues and Pull Requests are welcome! Please read [CONTRIBUTING.md](CONTRIBUTING.md) for development workflow, coding conventions, and submission guidelines.
 
 ---
 
