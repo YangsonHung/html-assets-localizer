@@ -42,11 +42,12 @@
   },
   "packageManager": "pnpm@10.18.3",
   "dependencies": {
+    "archiver": "^5.3.2",
     "express": "^4.19.2",
-    "open": "^9.1.0",
-    "archiver": "^5.3.2"
+    "open": "^9.1.0"
   },
   "devDependencies": {
+    "@types/archiver": "^6.0.3",
     "@types/express": "^4.17.21",
     "@types/node": "^20.10.5",
     "rimraf": "^5.0.5",
