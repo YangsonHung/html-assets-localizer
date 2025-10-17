@@ -325,9 +325,8 @@ localizer.process();</pre>
         </div>
     </footer>
 
-    <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
-    <script>
-        (function () {
+        <script type="module">
+        (() => {
             const fileInput = document.getElementById('htmlFileInput');
             if (!fileInput) {
                 return;
@@ -341,341 +340,160 @@ localizer.process();</pre>
             const resourceTableWrapper = document.getElementById('resourceTableWrapper');
             const resourceTableBody = document.querySelector('#resourceTable tbody');
 
-            let fileContent = '';
-            let originalFileName = '';
-            let resourcesInfo = [];
+            let selectedFile = null;
 
-            fileInput.addEventListener('change', handleFileSelect);
-            processButton.addEventListener('click', () => {
-                processFile().catch((error) => {
-                    appendLog(`处理过程中出现未捕获的错误：${error.message}`, 'danger');
-                    console.error(error);
-                });
-            });
-            resetButton.addEventListener('click', () => resetState());
-
-            function handleFileSelect(event) {
-                resetState(true);
-                selectionInfo.classList.remove('alert-warning', 'alert-danger');
-                selectionInfo.classList.add('alert-info');
-                selectionInfo.style.display = 'none';
+            fileInput.addEventListener('change', (event) => {
                 const file = event.target.files && event.target.files[0];
                 if (!file) {
-                    selectionInfo.style.display = 'none';
-                    processButton.disabled = true;
-                    resetButton.disabled = true;
-                    fileContent = '';
-                    originalFileName = '';
+                    resetState();
+                    appendLog('请选择需要处理的 HTML 文件。', 'warning');
                     return;
                 }
+                selectedFile = file;
+                updateSelectionInfo(file);
+            });
 
-                const isHtmlFile = file.type === 'text/html' || /\.html?$/i.test(file.name);
-                if (!isHtmlFile) {
-                    selectionInfo.classList.remove('alert-info', 'alert-danger');
-                    selectionInfo.classList.add('alert-warning');
-                    selectionInfo.textContent = '请选择扩展名为 .html/.htm 的文件。';
-                    selectionInfo.style.display = 'block';
-                    processButton.disabled = true;
-                    resetButton.disabled = false;
-                    fileContent = '';
-                    originalFileName = '';
-                    return;
-                }
+            processButton.addEventListener('click', async () => {
+                await processFile();
+            });
 
-                const reader = new FileReader();
-                reader.onload = () => {
-                    fileContent = typeof reader.result === 'string' ? reader.result : '';
-                    originalFileName = file.name;
-                    selectionInfo.classList.remove('alert-warning', 'alert-danger');
-                    selectionInfo.classList.add('alert-info');
-                    selectionInfo.textContent = `已选择文件：${file.name}（${formatBytes(file.size)}）`;
-                    selectionInfo.style.display = 'block';
-                    processButton.disabled = !fileContent;
-                    resetButton.disabled = false;
-                    appendLog('HTML 文件读取完成，可以开始处理。', 'success');
-                };
-                reader.onerror = () => {
-                    fileContent = '';
-                    originalFileName = '';
-                    selectionInfo.classList.remove('alert-info', 'alert-warning');
-                    selectionInfo.classList.add('alert-danger');
-                    selectionInfo.textContent = '读取文件失败，请重试。';
-                    selectionInfo.style.display = 'block';
-                    processButton.disabled = true;
-                    resetButton.disabled = false;
-                };
+            resetButton.addEventListener('click', () => resetState());
 
-                processButton.disabled = true;
-                reader.readAsText(file);
+            function updateSelectionInfo(file) {
+                selectionInfo.classList.remove('alert-warning', 'alert-danger');
+                selectionInfo.classList.add('alert-info');
+                selectionInfo.textContent = `已选择文件：${file.name}（${formatBytes(file.size)}）`;
+                selectionInfo.style.display = 'block';
+                processButton.disabled = false;
+                resetButton.disabled = false;
+                appendLog('HTML 文件已准备好，可以开始处理。', 'success');
             }
 
             async function processFile() {
-                if (!fileContent) {
+                if (!selectedFile) {
                     appendLog('请先选择需要处理的 HTML 文件。', 'warning');
-                    return;
-                }
-
-                if (typeof JSZip === 'undefined') {
-                    appendLog('JSZip 库未成功加载，无法生成压缩包。', 'danger');
                     return;
                 }
 
                 toggleProcessingState(true);
                 statusContainer.style.display = 'block';
-                resourcesInfo = [];
-                resourceTableBody.innerHTML = '';
-                resourceTableWrapper.style.display = 'none';
-                appendLog('开始解析 HTML 文件...', 'info');
+                appendLog('正在读取文件内容...', 'info');
 
                 try {
-                    const { blob, assetsInfo, localizedCount, foundCount } = await localizeHtml(fileContent);
-                    resourcesInfo = assetsInfo;
-                    appendLog('HTML 解析完成。', 'success');
-                    appendLog(`检测到 ${foundCount} 个外部资源。`, 'info');
-                    if (localizedCount === 0) {
-                        appendLog('未检测到需要本地化的远程资源，将仅输出原始 HTML。', 'warning');
-                    } else {
-                        appendLog(`共有 ${localizedCount} 个资源成功转换为本地引用。`, 'success');
-                        updateResourceTable();
+                    const htmlSource = await selectedFile.text();
+                    appendLog('正在请求服务器生成本地化资源...', 'info');
+
+                    const response = await fetch('/api/localize', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            fileName: selectedFile.name || 'index.html',
+                            htmlContent: htmlSource,
+                        }),
+                    });
+
+                    let payload = null;
+                    try {
+                        payload = await response.json();
+                    } catch (error) {
+                        payload = null;
                     }
 
-                    appendLog('正在生成压缩包...', 'info');
-                    const downloadName = buildDownloadFileName(originalFileName);
+                    if (!response.ok || !payload) {
+                        const message = payload && payload.error ? payload.error : `服务返回状态 ${response.status}`;
+                        throw new Error(message);
+                    }
+
+                    const { summary, zipBase64, zipName } = payload;
+                    appendLog(`检测到 ${summary.totalRemoteResources} 个远程资源，成功本地化 ${summary.localizedResources} 个。`, 'success');
+                    updateResourceTable(summary.assets || []);
+
+                    const blob = base64ToBlob(zipBase64, 'application/zip');
+                    const downloadName = zipName || buildDownloadFileName(selectedFile.name);
                     triggerDownload(blob, downloadName);
-                    appendLog(`处理完成，已生成 ${downloadName}。`, 'success');
+                    appendLog(`压缩包已生成：${downloadName}`, 'success');
+
+                    if (!summary.localizedResources) {
+                        appendLog('未检测到需要本地化的远程资源，已返回原始 HTML。', 'warning');
+                    }
                 } catch (error) {
-                    appendLog(`处理失败：${error.message}`, 'danger');
-                    console.error(error);
+                    const details = error instanceof Error ? error.message : String(error);
+                    appendLog(`处理失败：${details}`, 'danger');
                 } finally {
                     toggleProcessingState(false);
                 }
             }
 
-            function resetState(keepFileSelection = false) {
-                if (!keepFileSelection) {
-                    fileInput.value = '';
-                }
-                fileContent = '';
-                originalFileName = '';
-                selectionInfo.classList.remove('alert-warning', 'alert-danger');
-                selectionInfo.classList.add('alert-info');
+            function resetState() {
+                selectedFile = null;
+                fileInput.value = '';
                 selectionInfo.style.display = 'none';
                 logOutput.innerHTML = '';
                 statusContainer.style.display = 'none';
                 resourceTableBody.innerHTML = '';
                 resourceTableWrapper.style.display = 'none';
-                resourcesInfo = [];
-                processButton.disabled = !fileContent;
-                resetButton.disabled = !fileContent;
+                processButton.disabled = true;
+                resetButton.disabled = true;
                 processButton.innerHTML = '处理并下载压缩包';
                 fileInput.disabled = false;
             }
 
             function toggleProcessingState(isProcessing) {
                 fileInput.disabled = isProcessing;
-                processButton.disabled = isProcessing || !fileContent;
-                resetButton.disabled = true;
+                processButton.disabled = isProcessing || !selectedFile;
+                resetButton.disabled = isProcessing;
                 if (isProcessing) {
                     processButton.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>处理中...';
                 } else {
                     processButton.innerHTML = '处理并下载压缩包';
-                    resetButton.disabled = !fileContent;
                 }
             }
 
-            async function localizeHtml(htmlText) {
-                const parser = new DOMParser();
-                const doc = parser.parseFromString(htmlText, 'text/html');
-                if (doc.querySelector('parsererror')) {
-                    throw new Error('HTML 文件解析失败，请确认文件格式是否正确。');
+            function updateResourceTable(assets) {
+                if (!assets.length) {
+                    resourceTableWrapper.style.display = 'none';
+                    return;
                 }
 
-                const zip = new JSZip();
-                const resources = collectResources(doc);
-                const uniqueResourceUrls = new Set(resources.map((item) => item.url));
-                const usedFileNames = new Set();
-                const assetsInfo = [];
-                const downloadCache = new Map();
+                resourceTableBody.innerHTML = '';
+                assets.forEach((asset) => {
+                    const row = document.createElement('tr');
 
-                for (const resource of resources) {
-                    if (downloadCache.has(resource.url)) {
-                        const cached = downloadCache.get(resource.url);
-                        resource.element.setAttribute(resource.attr, cached.relativePath);
-                        resource.element.removeAttribute('integrity');
-                        resource.element.removeAttribute('crossorigin');
-                        appendLog(`已复用缓存资源：${resource.url}`, 'info');
-                        continue;
-                    }
+                    const typeCell = document.createElement('td');
+                    typeCell.textContent = asset.type;
+                    row.appendChild(typeCell);
 
-                    appendLog(`下载资源：${resource.url}`, 'info');
-                    try {
-                        const response = await fetch(resource.url);
-                        if (!response.ok) {
-                            throw new Error(`请求失败（HTTP ${response.status}）`);
-                        }
-                        const arrayBuffer = await response.arrayBuffer();
-                        const sanitizedFileName = getUniqueFileName(resource.suggestedName, usedFileNames);
-                        const folder = zip.folder(resource.subdir);
-                        if (!folder) {
-                            throw new Error('无法创建资源目录。');
-                        }
-                        folder.file(sanitizedFileName, arrayBuffer);
-                        const relativePath = `${resource.subdir}/${sanitizedFileName}`;
-                        resource.element.setAttribute(resource.attr, relativePath);
-                        resource.element.removeAttribute('integrity');
-                        resource.element.removeAttribute('crossorigin');
-                        downloadCache.set(resource.url, {
-                            relativePath,
-                            size: arrayBuffer.byteLength,
-                            type: resource.typeLabel
-                        });
-                        assetsInfo.push({
-                            type: resource.typeLabel,
-                            originalUrl: resource.originalAttributeValue,
-                            localPath: relativePath,
-                            size: arrayBuffer.byteLength
-                        });
-                        appendLog(`成功：${resource.url}`, 'success');
-                    } catch (error) {
-                        appendLog(`下载失败：${resource.url}（${error.message}）`, 'danger');
-                    }
-                }
+                    const originalUrlCell = document.createElement('td');
+                    originalUrlCell.classList.add('text-break');
+                    const link = document.createElement('a');
+                    link.href = asset.originalUrl;
+                    link.target = '_blank';
+                    link.rel = 'noopener noreferrer';
+                    link.textContent = asset.originalUrl;
+                    originalUrlCell.appendChild(link);
+                    row.appendChild(originalUrlCell);
 
-                const serializedHtml = serializeDocument(doc);
-                zip.file('index.html', serializedHtml);
-                const blob = await zip.generateAsync({ type: 'blob' });
+                    const localPathCell = document.createElement('td');
+                    localPathCell.classList.add('text-break');
+                    localPathCell.textContent = asset.localRelativePath;
+                    row.appendChild(localPathCell);
 
-                return {
-                    blob,
-                    assetsInfo,
-                    localizedCount: assetsInfo.length,
-                    foundCount: uniqueResourceUrls.size
-                };
-            }
+                    const sizeCell = document.createElement('td');
+                    sizeCell.classList.add('text-end');
+                    sizeCell.textContent = formatBytes(asset.bytesWritten || 0);
+                    row.appendChild(sizeCell);
 
-            function collectResources(doc) {
-                const resources = [];
-
-                const pushResource = (element, attr, typeLabel, subdir, defaultExt) => {
-                    const originalValue = (element.getAttribute(attr) || '').trim();
-                    if (!originalValue) {
-                        return;
-                    }
-
-                    let normalizedUrl = originalValue;
-                    if (normalizedUrl.startsWith('//')) {
-                        normalizedUrl = `${window.location.protocol === 'http:' ? 'http:' : 'https:'}${normalizedUrl}`;
-                    }
-
-                    if (!/^https?:\/\//i.test(normalizedUrl)) {
-                        return;
-                    }
-
-                    resources.push({
-                        element,
-                        attr,
-                        typeLabel,
-                        subdir,
-                        defaultExt,
-                        url: normalizedUrl,
-                        originalAttributeValue: originalValue,
-                        suggestedName: extractFileNameFromUrl(normalizedUrl, defaultExt, typeLabel)
-                    });
-                };
-
-                doc.querySelectorAll('script[src]').forEach((el) => pushResource(el, 'src', 'JavaScript', 'js', 'js'));
-                doc.querySelectorAll('link[rel~="stylesheet"][href]').forEach((el) => pushResource(el, 'href', 'CSS', 'css', 'css'));
-                doc.querySelectorAll('img[src]').forEach((el) => pushResource(el, 'src', 'Image', 'assets', 'png'));
-                doc.querySelectorAll('video[src]').forEach((el) => pushResource(el, 'src', 'Video', 'assets', 'mp4'));
-                doc.querySelectorAll('audio[src]').forEach((el) => pushResource(el, 'src', 'Audio', 'assets', 'mp3'));
-                doc.querySelectorAll('source[src]').forEach((el) => pushResource(el, 'src', 'Media', 'assets', 'bin'));
-                doc.querySelectorAll('link[href]').forEach((el) => {
-                    const relValue = (el.getAttribute('rel') || '').toLowerCase();
-                    if (relValue.includes('icon')) {
-                        pushResource(el, 'href', 'Icon', 'assets', 'png');
-                    }
+                    resourceTableBody.appendChild(row);
                 });
-
-                return resources;
-            }
-
-            function extractFileNameFromUrl(resourceUrl, defaultExt, typeLabel) {
-                const fallbackBase = `${typeLabel.toLowerCase()}-asset.${defaultExt}`;
-                try {
-                    const urlObj = new URL(resourceUrl);
-                    const rawSegment = urlObj.pathname.split('/').filter(Boolean).pop() || '';
-                    const sanitizedSegment = sanitizeFileName(rawSegment.split(/[?#]/)[0], fallbackBase);
-                    if (!sanitizedSegment || !sanitizedSegment.includes('.')) {
-                        return ensureExtension(sanitizedSegment || fallbackBase, defaultExt);
-                    }
-                    return sanitizedSegment;
-                } catch (error) {
-                    return ensureExtension(fallbackBase, defaultExt);
-                }
-            }
-
-            function ensureExtension(fileName, defaultExt) {
-                if (!fileName.includes('.')) {
-                    return `${fileName}.${defaultExt}`;
-                }
-                return fileName;
-            }
-
-            function sanitizeFileName(name, fallback) {
-                const sanitized = (name || '')
-                    .normalize('NFKD')
-                    .replace(/[^a-zA-Z0-9._-]/g, '_')
-                    .replace(/_+/g, '_')
-                    .replace(/^_+|_+$/g, '');
-                return sanitized || fallback || 'asset';
-            }
-
-            function getUniqueFileName(fileName, used) {
-                const parts = fileName.split('.');
-                const ext = parts.length > 1 ? `.${parts.pop()}` : '';
-                const base = parts.join('.') || 'asset';
-                let candidate = `${base}${ext}`;
-                let counter = 1;
-                while (used.has(candidate)) {
-                    candidate = `${base}_${counter}${ext}`;
-                    counter += 1;
-                }
-                used.add(candidate);
-                return candidate;
-            }
-
-            function serializeDocument(doc) {
-                const serializer = new XMLSerializer();
-                const docContent = serializer.serializeToString(doc);
-                if (doc.doctype) {
-                    const doctype = `<!DOCTYPE ${doc.doctype.name}${doc.doctype.publicId ? ` PUBLIC "${doc.doctype.publicId}"` : ''}${doc.doctype.systemId ? `${doc.doctype.publicId ? '' : ' SYSTEM'} "${doc.doctype.systemId}"` : ''}>`;
-                    return `${doctype}\n${docContent}`;
-                }
-                return docContent;
-            }
-
-            function buildDownloadFileName(fileName) {
-                const baseName = (fileName || 'localized-page').replace(/\.[^.]+$/, '');
-                const sanitized = sanitizeFileName(baseName, 'localized-page');
-                return `${sanitized}-localized.zip`;
-            }
-
-            function triggerDownload(blob, fileName) {
-                const url = URL.createObjectURL(blob);
-                const link = document.createElement('a');
-                link.href = url;
-                link.download = fileName;
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-                setTimeout(() => URL.revokeObjectURL(url), 2000);
+                resourceTableWrapper.style.display = 'block';
             }
 
             function appendLog(message, level = 'info') {
                 statusContainer.style.display = 'block';
                 const entry = document.createElement('div');
-                const className = getLogClass(level);
-                entry.className = `small mb-1 ${className}`;
+                entry.className = `small mb-1 ${getLogClass(level)}`;
                 const timestamp = new Date().toLocaleTimeString();
                 entry.textContent = `[${timestamp}] ${message}`;
                 logOutput.appendChild(entry);
@@ -697,47 +515,43 @@ localizer.process();</pre>
                 }
             }
 
-            function updateResourceTable() {
-                if (!resourcesInfo.length) {
-                    resourceTableWrapper.style.display = 'none';
-                    return;
+            function base64ToBlob(base64, type) {
+                const binary = atob(base64);
+                const length = binary.length;
+                const bytes = new Uint8Array(length);
+                for (let i = 0; i < length; i += 1) {
+                    bytes[i] = binary.charCodeAt(i);
                 }
+                return new Blob([bytes], { type });
+            }
 
-                resourceTableBody.innerHTML = '';
-                resourcesInfo.forEach((item) => {
-                    const row = document.createElement('tr');
+            function triggerDownload(blob, fileName) {
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = fileName;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                setTimeout(() => URL.revokeObjectURL(url), 2000);
+            }
 
-                    const typeCell = document.createElement('td');
-                    typeCell.textContent = item.type;
-                    row.appendChild(typeCell);
+            function sanitizeFileName(baseName, fallback = 'file') {
+                const sanitized = (baseName || fallback)
+                    .replace(/[\\/:*?"<>|]/g, '_')
+                    .replace(/\s+/g, '_')
+                    .slice(0, 120);
+                return sanitized || fallback;
+            }
 
-                    const originalUrlCell = document.createElement('td');
-                    originalUrlCell.classList.add('text-break');
-                    const link = document.createElement('a');
-                    link.href = item.originalUrl;
-                    link.target = '_blank';
-                    link.rel = 'noopener noreferrer';
-                    link.textContent = item.originalUrl;
-                    originalUrlCell.appendChild(link);
-                    row.appendChild(originalUrlCell);
-
-                    const localPathCell = document.createElement('td');
-                    localPathCell.classList.add('text-break');
-                    localPathCell.textContent = item.localPath;
-                    row.appendChild(localPathCell);
-
-                    const sizeCell = document.createElement('td');
-                    sizeCell.classList.add('text-end');
-                    sizeCell.textContent = formatBytes(item.size);
-                    row.appendChild(sizeCell);
-
-                    resourceTableBody.appendChild(row);
-                });
-                resourceTableWrapper.style.display = 'block';
+            function buildDownloadFileName(fileName) {
+                const baseName = (fileName || 'localized-page').replace(/\.[^.]+$/, '');
+                const sanitized = sanitizeFileName(baseName, 'localized-page');
+                return `${sanitized}-localized.zip`;
             }
 
             function formatBytes(bytes) {
-                if (bytes === 0) {
+                if (!bytes) {
                     return '0 B';
                 }
                 const units = ['B', 'KB', 'MB', 'GB'];
@@ -747,6 +561,6 @@ localizer.process();</pre>
             }
         })();
     </script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
