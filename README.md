@@ -1,181 +1,99 @@
 # HTML Assets Localizer
 
-A tool for localizing external JavaScript and CSS resources in HTML files, with implementations in both **Python** and **Node.js**, helping you build offline-ready page resource dependencies.
+HTML Assets Localizer 提供一个 TypeScript/Node.js CLI 与本地 UI 服务，帮助将 HTML 中引用的远程 JavaScript 与 CSS 资源下载到本地，便于构建离线可用的页面资源依赖。
 
-> 中文文档 [README.zh.md](README.zh.md)
+> 中文文档请参见 [README.zh.md](README.zh.md)
 
 ## Features
 
-- Automatically detect and download external JavaScript and CSS references in HTML
-- Generate structured `js/` and `css/` directories locally and update reference paths
-- Support both command-line usage and modular integration
-- Avoid duplicate downloads through resource hash naming
-- Support HTTP/HTTPS and redirects
+- TypeScript 重写的 CLI：使用 `html-assets-localizer <html> <target>` 快速本地化资源
+- `ui` 子命令内置静态站点服务，复用 `docs/index.html` 的交互体验
+- 自动创建 `js/` 与 `css/` 目录并去重命名，支持 HTTP/HTTPS 与多次重定向
+- 提供编程接口，可在 Node.js 项目中直接导入并复用核心逻辑
+- 历史 Python 与旧版 Node.js 实现保存在 `archive/` 目录，便于参考
 
 ## Repository Structure
 
 ```
 .
+├── AGENTS.md
+├── archive/
+│   ├── js/assets_localizer.js      # 归档的旧版 Node.js 实现
+│   └── py/assets_localizer.py      # 归档的 Python 实现
 ├── docs/
-│   └── index.html             # Project documentation entry page
+│   └── index.html                  # UI 模式复用的静态页面
+├── dist/                           # tsc 编译后的输出（npm 包入口）
+├── example.html
+├── package.json
 ├── src/
-│   ├── js/
-│   │   └── assets_localizer.js
-│   └── py/
-│       └── assets_localizer.py
-├── LICENSE
-├── README.md
-└── .gitignore
+│   ├── cli.ts
+│   ├── index.ts
+│   ├── localizer.ts
+│   └── server/uiServer.ts
+├── tsconfig.json
+└── ...
 ```
 
 ## Requirements
 
-### Python Version
+### Node.js CLI
 
-- Python 3.6+
-- Uses standard library, no additional dependencies required
+- Node.js 18 或更高版本
+- 使用 `pnpm install` 安装依赖，随后执行 `pnpm run build` 产出 `dist/`
 
-### Node.js Version
+### Archived Python Script
 
-- Node.js 12+
-- Uses built-in modules, no additional dependencies required
+- Python 3.6+，脚本位于 `archive/py/assets_localizer.py`，保持原样以备查验
 
-## Usage
-
-### Python Version
+## Installation & Usage
 
 ```bash
-# Basic usage
-python src/py/assets_localizer.py input.html target_directory
+# 安装依赖并构建
+pnpm install
+pnpm run build
 
-# Example
-python src/py/assets_localizer.py example.html output
+# 运行 CLI（本地路径示例）
+node dist/cli.js example.html output
+
+# 或在发布为 npm 包后
+pnpm dlx html-assets-localizer example.html output
 ```
 
-### Node.js Version
+CLI 会在目标目录下生成更新后的 HTML 文件以及 `js/`、`css/` 子目录，并打印资源映射详情。
+
+### UI Mode
 
 ```bash
-# Basic usage
-node src/js/assets_localizer.js input.html target_directory
-
-# Example
-node src/js/assets_localizer.js example.html output
+node dist/cli.js ui
+# 或未来使用已发布包
+html-assets-localizer ui --port 4173 --host 0.0.0.0
 ```
 
-## Usage Example
+命令会启动一个本地静态服务，托管 `docs/index.html`，默认自动打开浏览器。通过页面即可上传 HTML、实时查看日志并下载打包结果。
 
-Suppose you have an HTML file with external resources:
+### Programmatic Usage
 
-```html
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Example Page</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
-</head>
-<body>
-    <h1>Hello World</h1>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
+```ts
+import { HtmlAssetsLocalizer } from 'html-assets-localizer';
+
+const localizer = new HtmlAssetsLocalizer({
+  htmlFilePath: './example.html',
+  targetDir: './output',
+});
+
+const summary = await localizer.process();
+console.log(summary.assets);
 ```
 
-After running the tool:
+若作为子模块使用，请先通过 `pnpm run build` 生成 `dist/`，或在自身项目中安装 npm 包。
 
-```bash
-python src/py/assets_localizer.py example.html myProject
-```
+## Archived Implementations
 
-The tool will create in the `myProject/` directory:
+- `archive/js/assets_localizer.js`：原始 Node.js CommonJS 版本
+- `archive/py/assets_localizer.py`：Python 版本，依赖标准库
 
-1. Create `js/` and `css/` subdirectories
-2. Download all external resources to corresponding directories
-3. Output a new `index.html` that references local resources
-
-## Output Structure (Example)
-
-```
-myProject/
-├── index.html
-├── js/
-│   ├── jquery.min.js
-│   ├── bootstrap.min.js
-│   └── script_abc123.js
-└── css/
-    ├── bootstrap.min.css
-    ├── style_def456.css
-    └── main.css
-```
-
-## Using as a Module
-
-### Python
-
-```python
-from pathlib import Path
-import sys
-
-project_root = Path(__file__).resolve().parent
-sys.path.append(str(project_root / "src" / "py"))
-
-from assets_localizer import HTMLScriptLocalizer
-
-localizer = HTMLScriptLocalizer("input.html", "target_directory")
-localizer.process()
-```
-
-### Node.js
-
-```javascript
-const HTMLScriptLocalizer = require("./src/js/assets_localizer");
-
-const localizer = new HTMLScriptLocalizer("input.html", "target_directory");
-localizer.process();
-```
-
-## Configuration Options
-
-- `html_file_path`: Input HTML file path
-- `target_directory`: Output directory, where `js/`, `css/` and processed HTML files will be generated
-
-## Notes
-
-1. Maintain network connection to download external resources
-2. Ensure write permissions to the target directory
-3. If resource CDNs have access restrictions, please confirm authorization in advance
-4. If files with the same name exist in the target directory, the tool will skip downloading to avoid overwriting
-
-## Troubleshooting
-
-### Download Failures
-
-- Check network connection
-- Confirm resource URLs are accessible
-- Check firewall or proxy settings
-
-### File Permission Errors
-
-- Ensure write permissions to the target directory
-- Windows environment may require administrator privileges
-
-### Encoding Issues
-
-- Python version will automatically try UTF-8 and GBK encoding
-- Ensure HTML file encoding format is correct
+它们不再接受新功能，只作为参考保留。
 
 ## License
 
-MIT License
-
-## Contributing
-
-Issues and Pull Requests are welcome to improve this tool!
-
-## Changelog
-
-### v1.0.0
-
-- Initial release
-- Support JavaScript and CSS resource localization
-- Provide Python and Node.js implementations
+MIT License.

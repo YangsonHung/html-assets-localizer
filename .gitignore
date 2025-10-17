@@ -188,6 +188,9 @@ assets/
 !/src/
 !/src/js/
 !/src/py/
+!/archive/
+!/archive/js/
+!/archive/py/
 
 # Generated HTML files
 *_local.html

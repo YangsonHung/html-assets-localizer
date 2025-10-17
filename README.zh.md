@@ -1,181 +1,99 @@
 # HTML Assets Localizer
 
-一个用于将 HTML 文件中的外部 JavaScript 与 CSS 资源本地化的工具，提供 **Python** 与 **Node.js** 两种实现，帮助你构建离线可用的页面资源依赖。
+HTML Assets Localizer 是一个用于将 HTML 文件中的远程 JavaScript、CSS 等资源转存到本地的工具集，现提供基于 TypeScript/Node.js 的 CLI 与可视化 UI 服务，助力构建离线可用的页面资源依赖。
 
-> English documentation [README.md](README.md)
+> English documentation is available in [README.md](README.md)
 
 ## 功能特性
 
-- 自动检测并下载 HTML 中的外部 JavaScript 和 CSS 引用
-- 在本地生成结构化的 `js/`、`css/` 目录并更新引用路径
-- 同时支持命令行使用与模块化集成
-- 通过资源哈希命名避免重复下载
-- 支持 HTTP/HTTPS 及重定向
+- TypeScript 重写的 CLI：`html-assets-localizer <html> <target>` 一键本地化
+- 内置 `ui` 子命令，直接启动 `docs/index.html` 对应的交互式体验
+- 自动创建 `js/`、`css/` 目录并为重复资源生成唯一文件名
+- 支持 HTTP/HTTPS、30 秒超时与多次重定向处理
+- 旧版 Node.js 与 Python 实现已归档至 `archive/`，方便回溯
 
 ## 仓库结构
 
 ```
 .
+├── AGENTS.md
+├── archive/
+│   ├── js/assets_localizer.js      # 历史 Node.js 版本
+│   └── py/assets_localizer.py      # 历史 Python 版本
 ├── docs/
-│   └── index.html             # 项目文档入口页面
+│   └── index.html                  # UI 服务复用的页面
+├── dist/                           # tsc 编译后的输出
+├── example.html
+├── package.json
 ├── src/
-│   ├── js/
-│   │   └── assets_localizer.js
-│   └── py/
-│       └── assets_localizer.py
-├── LICENSE
-├── README.md
-└── .gitignore
+│   ├── cli.ts
+│   ├── index.ts
+│   ├── localizer.ts
+│   └── server/uiServer.ts
+├── tsconfig.json
+└── ...
 ```
 
-## 安装要求
+## 环境要求
 
-### Python 版本
+### Node.js CLI
 
-- Python 3.6+
-- 使用标准库，无需额外依赖
+- Node.js 18 及以上版本
+- 执行 `pnpm install` 安装依赖，随后 `pnpm run build` 生成 `dist/`
 
-### Node.js 版本
+### 归档的 Python 版本
 
-- Node.js 12+
-- 使用内置模块，无需额外依赖
+- Python 3.6+，脚本位于 `archive/py/assets_localizer.py`，仅作历史保留
 
-## 使用方法
-
-### Python 版本
+## 安装与使用
 
 ```bash
-# 基本用法
-python src/py/assets_localizer.py input.html target_directory
+# 安装依赖并构建
+pnpm install
+pnpm run build
 
-# 示例
-python src/py/assets_localizer.py example.html output
+# 运行 CLI（本地执行示例）
+node dist/cli.js example.html output
+
+# 未来以 npm 包方式安装后
+pnpm dlx html-assets-localizer example.html output
 ```
 
-### Node.js 版本
+CLI 会在目标目录写入更新后的 HTML 文件及 `js/`、`css/` 子目录，并输出资源映射详情。
+
+### UI 模式
 
 ```bash
-# 基本用法
-node src/js/assets_localizer.js input.html target_directory
-
-# 示例
-node src/js/assets_localizer.js example.html output
+node dist/cli.js ui
+# 或
+html-assets-localizer ui --port 4173 --host 0.0.0.0
 ```
 
-## 使用示例
+命令会启动本地静态服务，托管 `docs/index.html`，默认自动打开浏览器。页面支持上传 HTML、查看下载日志并导出压缩包。
 
-假设你有一个包含外部资源的 HTML 文件：
+### 编程方式集成
 
-```html
-<!DOCTYPE html>
-<html>
-<head>
-    <title>示例页面</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
-</head>
-<body>
-    <h1>Hello World</h1>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
+```ts
+import { HtmlAssetsLocalizer } from 'html-assets-localizer';
+
+const localizer = new HtmlAssetsLocalizer({
+  htmlFilePath: './example.html',
+  targetDir: './output',
+});
+
+const summary = await localizer.process();
+console.log(summary.assets);
 ```
 
-运行工具后：
+若在本地调试，请先执行 `pnpm run build`；若已发布为 npm 包，可直接在项目中安装并导入。
 
-```bash
-python src/py/assets_localizer.py example.html myProject
-```
+## 归档实现
 
-工具会在 `myProject/` 目录中：
+- `archive/js/assets_localizer.js`：旧版 Node.js CommonJS 版本
+- `archive/py/assets_localizer.py`：Python 版本，仅依赖标准库
 
-1. 创建 `js/` 与 `css/` 子目录
-2. 下载所有外部资源到对应目录
-3. 输出修改后引用本地资源的新 `index.html`
+上述文件不再更新，仅供参考。
 
-## 输出结构（示例）
+## License
 
-```
-myProject/
-├── index.html
-├── js/
-│   ├── jquery.min.js
-│   ├── bootstrap.min.js
-│   └── script_abc123.js
-└── css/
-    ├── bootstrap.min.css
-    ├── style_def456.css
-    └── main.css
-```
-
-## 作为模块使用
-
-### Python
-
-```python
-from pathlib import Path
-import sys
-
-project_root = Path(__file__).resolve().parent
-sys.path.append(str(project_root / "src" / "py"))
-
-from assets_localizer import HTMLScriptLocalizer
-
-localizer = HTMLScriptLocalizer("input.html", "target_directory")
-localizer.process()
-```
-
-### Node.js
-
-```javascript
-const HTMLScriptLocalizer = require("./src/js/assets_localizer");
-
-const localizer = new HTMLScriptLocalizer("input.html", "target_directory");
-localizer.process();
-```
-
-## 配置选项
-
-- `html_file_path`: 输入 HTML 文件路径
-- `target_directory`: 输出目录，将在该目录下生成 `js/`、`css/` 与处理后的 HTML 文件
-
-## 注意事项
-
-1. 保持网络连接以下载外部资源
-2. 确认拥有对目标目录的写入权限
-3. 若资源 CDN 存在访问限制，请提前确认授权
-4. 若目标目录存在同名文件，工具会跳过下载以避免覆盖
-
-## 故障排除
-
-### 下载失败
-
-- 检查网络连接
-- 确认资源 URL 可访问
-- 检查防火墙或代理设置
-
-### 文件权限错误
-
-- 确保对目标目录拥有写入权限
-- Windows 环境下可能需要管理员权限
-
-### 编码问题
-
-- Python 版本会自动尝试 UTF-8 与 GBK 编码
-- 确保 HTML 文件编码格式正确
-
-## 许可证
-
-MIT License
-
-## 贡献
-
-欢迎提交 Issue 与 Pull Request 来改进该工具！
-
-## 更新日志
-
-### v1.0.0
-
-- 初始版本发布
-- 支持 JavaScript 与 CSS 资源本地化
-- 提供 Python 与 Node.js 两种实现
+MIT License.

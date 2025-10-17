@@ -1,0 +1,50 @@
+{
+  "name": "html-assets-localizer",
+  "version": "1.1.0",
+  "description": "CLI and UI toolkit for localizing external assets in HTML documents.",
+  "license": "MIT",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "bin": {
+    "html-assets-localizer": "dist/cli.js"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "start": "node dist/cli.js",
+    "dev": "ts-node src/cli.ts",
+    "clean": "rimraf dist"
+  },
+  "files": [
+    "dist",
+    "docs",
+    "README.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "keywords": [
+    "html",
+    "assets",
+    "localizer",
+    "cli",
+    "offline",
+    "local"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/YangsonHung/html-assets-localizer.git"
+  },
+  "packageManager": "pnpm@10.18.3",
+  "dependencies": {
+    "express": "^4.19.2",
+    "open": "^9.1.0"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.21",
+    "@types/node": "^20.10.5",
+    "rimraf": "^5.0.5",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.3.3"
+  }
+}
