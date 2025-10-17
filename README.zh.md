@@ -19,6 +19,8 @@ pnpm run build     # 编译 TypeScript 输出
 
 ```bash
 pnpm add -g html-assets-localizer
+npm install -g html-assets-localizer
+yarn global add html-assets-localizer
 ```
 
 全局安装后，可以在任意位置使用 `html-assets-localizer`、`hal` 或 UI 子命令，无需克隆仓库。

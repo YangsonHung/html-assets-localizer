@@ -19,6 +19,8 @@ Want a ready-to-run CLI everywhere on your system?
 
 ```bash
 pnpm add -g html-assets-localizer
+npm install -g html-assets-localizer
+yarn global add html-assets-localizer
 ```
 
 After the global install you can invoke `html-assets-localizer`, `hal`, or the UI subcommand from any directory without cloning the repository.
