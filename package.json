@@ -1,6 +1,6 @@
 {
   "name": "html-assets-localizer",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "description": "CLI and UI toolkit for localizing external assets in HTML documents.",
   "license": "MIT",
   "main": "dist/index.js",
