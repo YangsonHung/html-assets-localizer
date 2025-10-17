@@ -104,7 +104,7 @@ export class HtmlAssetsLocalizer {
       return await fs.readFile(this.htmlFilePath, 'utf8');
     } catch (error) {
       const message = error instanceof Error ? error.message : 'unknown';
-      throw new Error(`读取 HTML 文件失败: ${message}`);
+      throw new Error(`Failed to read HTML file: ${message}`);
     }
   }
 
@@ -175,15 +175,15 @@ export class HtmlAssetsLocalizer {
         type,
       };
     } catch (error) {
-      const reason = error instanceof Error ? error.message : '网络请求失败';
-      console.warn(`下载资源失败：${url}（${reason}）`);
+      const reason = error instanceof Error ? error.message : 'network request failed';
+      console.warn(`Failed to download resource: ${url} (${reason})`);
       return null;
     }
   }
 
   private async fetchRemoteResource(url: string, redirectsRemaining: number): Promise<DownloadResult> {
     if (redirectsRemaining <= 0) {
-      throw new Error('重定向过多，已停止请求');
+      throw new Error('Too many redirects');
     }
 
     const urlObject = new URL(url);
@@ -198,7 +198,7 @@ export class HtmlAssetsLocalizer {
         'User-Agent':
           'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0 Safari/537.36',
         Accept: '*/*',
-        'Accept-Language': 'zh-CN,zh;q=0.9,en;q=0.8',
+        'Accept-Language': 'en-US,en;q=0.9',
         Connection: 'close',
       },
       timeout: REQUEST_TIMEOUT_MS,
@@ -238,7 +238,7 @@ export class HtmlAssetsLocalizer {
       });
 
       request.on('timeout', () => {
-        request.destroy(new Error('请求超时'));
+        request.destroy(new Error('Request timeout'));
       });
       request.on('error', reject);
       request.end();

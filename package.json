@@ -6,7 +6,8 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "bin": {
-    "html-assets-localizer": "dist/cli.js"
+    "html-assets-localizer": "dist/cli.js",
+    "hal": "dist/cli.js"
   },
   "scripts": {
     "build": "tsc -p tsconfig.json",

@@ -12,20 +12,45 @@ interface UiCommandOptions {
   openBrowser: boolean;
 }
 
+let cachedVersion: string | null = null;
+
+async function resolvePackageVersion(): Promise<string> {
+  if (cachedVersion) {
+    return cachedVersion;
+  }
+  try {
+    const packageJsonPath = path.resolve(__dirname, '..', 'package.json');
+    const raw = await fs.readFile(packageJsonPath, 'utf8');
+    const data = JSON.parse(raw) as { version?: string };
+    cachedVersion = data.version ?? '0.0.0';
+  } catch {
+    cachedVersion = 'unknown';
+  }
+  return cachedVersion;
+}
+
 function printUsage(): void {
-  console.log(`
-html-assets-localizer - 将 HTML 中的外部 JS/CSS 资源本地化
-
-使用方法:
-  html-assets-localizer <html文件路径> <目标目录>
-  html-assets-localizer ui [--port <端口>] [--host <主机>] [--no-open]
-
-选项:
-  --port <端口>    指定 UI 服务监听端口（默认自动选择空闲端口）
-  --host <主机>    指定 UI 服务绑定地址（默认 127.0.0.1）
-  --no-open        启动 UI 服务时不自动打开浏览器
-  -h, --help       查看帮助
-`.trim());
+  console.log(
+    [
+      'html-assets-localizer — Localize external JS/CSS assets referenced in HTML files',
+      '',
+      'Usage:',
+      '  html-assets-localizer <html-file> <output-dir>',
+      '  html-assets-localizer ui [--port <port>] [--host <hostname>] [--no-open]',
+      '  html-assets-localizer help',
+      '  html-assets-localizer version',
+      '',
+      'Aliases:',
+      '  hal                  Shorthand alias for html-assets-localizer',
+      '',
+      'Options:',
+      '  --port <port>        UI server port (defaults to a random free port)',
+      '  --host <hostname>    UI server host (defaults to 127.0.0.1)',
+      '  --no-open            Do not open the browser automatically',
+      '  -h, --help           Show usage information',
+      '  -v, --version        Show version information',
+    ].join('\n'),
+  );
 }
 
 function formatBytes(size: number): string {
@@ -43,13 +68,13 @@ function formatBytes(size: number): string {
 }
 
 function printSummary(summary: LocalizationSummary): void {
-  console.log('处理完成:');
-  console.log(`  源文件: ${summary.sourceHtmlPath}`);
-  console.log(`  输出 HTML: ${summary.outputHtmlPath}`);
-  console.log(`  发现远程资源: ${summary.totalRemoteResources}`);
-  console.log(`  已本地化资源: ${summary.localizedResources}`);
+  console.log('Localization summary:');
+  console.log(`  Source HTML: ${summary.sourceHtmlPath}`);
+  console.log(`  Output HTML: ${summary.outputHtmlPath}`);
+  console.log(`  Remote resources detected: ${summary.totalRemoteResources}`);
+  console.log(`  Resources localized: ${summary.localizedResources}`);
   if (summary.assets.length > 0) {
-    console.log('  资源映射:');
+    console.log('  Asset mapping:');
     summary.assets.forEach((asset) => {
       console.log(
         `    - [${asset.type}] ${asset.originalUrl} -> ${asset.localRelativePath} (${formatBytes(
@@ -64,7 +89,7 @@ async function ensureFileExists(filePath: string): Promise<void> {
   try {
     await fs.access(filePath);
   } catch {
-    throw new Error(`指定的 HTML 文件不存在: ${filePath}`);
+    throw new Error(`HTML file not found: ${filePath}`);
   }
 }
 
@@ -78,25 +103,25 @@ function parseUiOptions(args: string[]): UiCommandOptions {
     if (current === '--port') {
       const value = args[i + 1];
       if (!value) {
-        throw new Error('缺少 --port 参数的取值');
+        throw new Error('Missing value for --port');
       }
       const parsed = Number.parseInt(value, 10);
       if (Number.isNaN(parsed) || parsed <= 0) {
-        throw new Error('端口号必须为正整数');
+        throw new Error('Port must be a positive integer');
       }
       port = parsed;
       i += 1;
     } else if (current === '--host') {
       const value = args[i + 1];
       if (!value) {
-        throw new Error('缺少 --host 参数的取值');
+        throw new Error('Missing value for --host');
       }
       host = value;
       i += 1;
     } else if (current === '--no-open') {
       openBrowser = false;
     } else {
-      throw new Error(`无法识别的参数: ${current}`);
+      throw new Error(`Unknown option: ${current}`);
     }
   }
 
@@ -106,12 +131,29 @@ function parseUiOptions(args: string[]): UiCommandOptions {
 async function runCli(): Promise<void> {
   const argv = process.argv.slice(2);
 
+  if (argv.includes('--version') || argv.includes('-v')) {
+    const version = await resolvePackageVersion();
+    console.log(version);
+    return;
+  }
+
   if (argv.length === 0 || argv.includes('--help') || argv.includes('-h')) {
     printUsage();
     return;
   }
 
   const [command, ...rest] = argv;
+
+  if (command === 'help') {
+    printUsage();
+    return;
+  }
+
+  if (command === 'version') {
+    const version = await resolvePackageVersion();
+    console.log(version);
+    return;
+  }
 
   if (command === 'ui') {
     const options = parseUiOptions(rest);
@@ -135,6 +177,6 @@ async function runCli(): Promise<void> {
 
 runCli().catch((error) => {
   const message = error instanceof Error ? error.message : String(error);
-  console.error(`执行失败: ${message}`);
+  console.error(`Command failed: ${message}`);
   process.exitCode = 1;
 });

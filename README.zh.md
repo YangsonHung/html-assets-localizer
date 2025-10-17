@@ -1,99 +1,76 @@
-# HTML Assets Localizer
+# HTML Assets Localizer 🌐✨
 
-HTML Assets Localizer 是一个用于将 HTML 文件中的远程 JavaScript、CSS 等资源转存到本地的工具集，现提供基于 TypeScript/Node.js 的 CLI 与可视化 UI 服务，助力构建离线可用的页面资源依赖。
+HTML Assets Localizer 可以将 HTML 中引用的远程 JavaScript、CSS 资源全部下载到本地，帮助你打造真正离线可用的页面。它同时提供命令行和图形界面两种体验，适合不同的团队协作方式。
 
-> English documentation is available in [README.md](README.md)
+> 想查看英文指南？请访问 [README.md](README.md)
 
-## 功能特性
-
-- TypeScript 重写的 CLI：`html-assets-localizer <html> <target>` 一键本地化
-- 内置 `ui` 子命令，直接启动 `docs/index.html` 对应的交互式体验
-- 自动创建 `js/`、`css/` 目录并为重复资源生成唯一文件名
-- 支持 HTTP/HTTPS、30 秒超时与多次重定向处理
-- 旧版 Node.js 与 Python 实现已归档至 `archive/`，方便回溯
-
-## 仓库结构
-
-```
-.
-├── AGENTS.md
-├── archive/
-│   ├── js/assets_localizer.js      # 历史 Node.js 版本
-│   └── py/assets_localizer.py      # 历史 Python 版本
-├── docs/
-│   └── index.html                  # UI 服务复用的页面
-├── dist/                           # tsc 编译后的输出
-├── example.html
-├── package.json
-├── src/
-│   ├── cli.ts
-│   ├── index.ts
-│   ├── localizer.ts
-│   └── server/uiServer.ts
-├── tsconfig.json
-└── ...
-```
-
-## 环境要求
-
-### Node.js CLI
-
-- Node.js 18 及以上版本
-- 执行 `pnpm install` 安装依赖，随后 `pnpm run build` 生成 `dist/`
-
-### 归档的 Python 版本
-
-- Python 3.6+，脚本位于 `archive/py/assets_localizer.py`，仅作历史保留
-
-## 安装与使用
+## ⚡ 快速开始
 
 ```bash
-# 安装依赖并构建
-pnpm install
-pnpm run build
-
-# 运行 CLI（本地执行示例）
-node dist/cli.js example.html output
-
-# 未来以 npm 包方式安装后
-pnpm dlx html-assets-localizer example.html output
+pnpm install       # 安装依赖
+pnpm run build     # 编译 TypeScript 输出
 ```
 
-CLI 会在目标目录写入更新后的 HTML 文件及 `js/`、`css/` 子目录，并输出资源映射详情。
+只要源码没有改动，通常只需编译一次即可。
 
-### UI 模式
+## 🧰 CLI 模式
+
+- `html-assets-localizer <html-file> <output-dir>` —— 从 HTML 中下载并重写外链资源。
+- `hal <html-file> <output-dir>` —— CLI 的简写别名，行为完全一致。
+- 工具会在 `<output-dir>` 下生成 `js/`、`css/` 子目录，并打印每个资源的映射结果。
+
+示例：
 
 ```bash
-node dist/cli.js ui
-# 或
-html-assets-localizer ui --port 4173 --host 0.0.0.0
+node dist/cli.js example.html offline-bundle
 ```
 
-命令会启动本地静态服务，托管 `docs/index.html`，默认自动打开浏览器。页面支持上传 HTML、查看下载日志并导出压缩包。
+### 📋 常用子命令
 
-### 编程方式集成
+- `html-assets-localizer help` / `hal help` —— 查看命令用法与参数。
+- `html-assets-localizer version` / `hal version` —— 输出当前版本号。
+- `--port`、`--host`、`--no-open` —— 在 UI 模式下可用的额外参数。
+
+## 🖥️ UI 模式
+
+想要拖拽上传？试试以下命令：
+
+```bash
+html-assets-localizer ui
+```
+
+- 会在本地启动一个托管 `docs/index.html` 的服务。
+- 默认自动选择空闲端口并打开浏览器（可通过 `--no-open` 禁用）。
+- 上传 HTML，查看下载日志，并直接获取压缩包结果。
+
+需要固定地址时，可执行：
+
+```bash
+hal ui --port 4173 --host 0.0.0.0
+```
+
+## 🧑‍💻 编程接入
 
 ```ts
 import { HtmlAssetsLocalizer } from 'html-assets-localizer';
 
 const localizer = new HtmlAssetsLocalizer({
   htmlFilePath: './example.html',
-  targetDir: './output',
+  targetDir: './offline',
 });
 
 const summary = await localizer.process();
 console.log(summary.assets);
 ```
 
-若在本地调试，请先执行 `pnpm run build`；若已发布为 npm 包，可直接在项目中安装并导入。
+如果直接使用源码，请先执行 `pnpm run build` 以生成 `dist/` 输出；发布为 npm 包后，只需安装依赖即可引用。
 
-## 归档实现
+## 💡 小贴士
 
-- `archive/js/assets_localizer.js`：旧版 Node.js CommonJS 版本
-- `archive/py/assets_localizer.py`：Python 版本，仅依赖标准库
+- 下载资源时请保持网络畅通，若遇到超时可稍后重试。
+- 重名文件会自动追加序号后缀，避免覆盖。
+- 修改 `src/` 下的源码后，重新运行 `pnpm run build` 以更新编译结果。
 
-上述文件不再更新，仅供参考。
+## 📄 许可证
 
-## License
-
-MIT License.
+MIT License —— 祝你构建出色的离线体验！

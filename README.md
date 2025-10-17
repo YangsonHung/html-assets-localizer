@@ -1,105 +1,76 @@
-# HTML Assets Localizer
+# HTML Assets Localizer 🌐✨
 
-HTML Assets Localizer is a TypeScript/Node.js toolkit that mirrors external JavaScript and CSS resources into an offline-ready workspace. It ships with a command-line interface and an optional UI so you can keep HTML pages self-contained without relying on remote CDNs.
+HTML Assets Localizer keeps your HTML projects fully offline by mirroring external JavaScript and CSS assets to local folders. It offers both a quick CLI workflow and a browser-based UI for teams that prefer drag-and-drop convenience.
 
-> 中文文档请参见 [README.zh.md](README.zh.md)
+> Looking for the Chinese quick start? Head over to [README.zh.md](README.zh.md)
 
-## Features
-
-- TypeScript-based CLI: run `html-assets-localizer <html-file> <output-dir>` to download remote assets and rewrite HTML references.
-- `ui` sub-command: serves `docs/index.html`, recreating the upload/download flow from the hosted demo.
-- Automatic directory management: creates `js/` and `css/` folders, deduplicates filenames, and handles HTTP/HTTPS with redirects.
-- Programmatic API: import the TypeScript implementation and reuse it inside your own Node.js applications.
-- Archived parity: legacy Node.js and Python versions are preserved under `archive/` for historical reference.
-
-## Project Structure
-
-```
-.
-├── AGENTS.md
-├── archive/
-│   ├── js/assets_localizer.js      # Archived Node.js implementation
-│   └── py/assets_localizer.py      # Archived Python implementation
-├── docs/
-│   └── index.html                  # UI served by the `ui` sub-command
-├── dist/                           # Compiled output (excluded from source control)
-├── example.html
-├── package.json
-├── src/
-│   ├── cli.ts
-│   ├── index.ts
-│   ├── localizer.ts
-│   └── server/uiServer.ts
-├── tsconfig.json
-└── ...
-```
-
-## Requirements
-
-### Node.js CLI
-
-- Node.js 18 or newer.
-- Install dependencies with `pnpm install`, then run `pnpm run build` once to populate `dist/`.
-
-### Archived Python Script
-
-- Python 3.6 or newer if you need to reference the legacy script located at `archive/py/assets_localizer.py`.
-
-## Setup
+## ⚡ Quick Start
 
 ```bash
-# Install dependencies and compile TypeScript
-pnpm install
-pnpm run build
+pnpm install       # install dependencies
+pnpm run build     # compile TypeScript outputs
 ```
 
-## CLI Usage
+You only need to build once unless you modify the source code.
+
+## 🧰 CLI Mode
+
+- `html-assets-localizer <html-file> <output-dir>` — localize assets from an HTML file.
+- `hal <html-file> <output-dir>` — shorthand alias, identical behavior.
+- The command creates `js/` and `css/` folders within `<output-dir>` and prints a summary of every rewritten resource.
+
+Example:
 
 ```bash
-# Localize an HTML file using the compiled CLI
-node dist/cli.js example.html output
-
-# After publishing to npm, run the CLI without cloning the repo
-pnpm dlx html-assets-localizer example.html output
+node dist/cli.js example.html offline-bundle
 ```
 
-The command writes an updated HTML file and populates `js/` and `css/` folders inside the target directory while printing a resource mapping summary.
+### 📋 Helpful Subcommands
 
-## UI Mode
+- `html-assets-localizer help` / `hal help` — show usage and options.
+- `html-assets-localizer version` / `hal version` — print the package version.
+- `--port`, `--host`, `--no-open` — available when launching the UI mode.
+
+## 🖥️ UI Mode
+
+Launch an interactive UI that mirrors the hosted demo:
 
 ```bash
-# Serve the local UI on a random free port
-node dist/cli.js ui
-
-# Or expose it on a predictable address
-html-assets-localizer ui --port 4173 --host 0.0.0.0
+html-assets-localizer ui
 ```
 
-The server hosts `docs/index.html`, optionally opens your default browser, and lets you upload HTML files, inspect logs, and download the generated archive.
+- Serves `docs/index.html` on a local port.
+- Auto-selects a free port and opens your default browser (disable with `--no-open`).
+- Upload an HTML file, review download logs, and grab a ready-to-use archive.
 
-## Programmatic Usage
+Need a predictable address? Use:
+
+```bash
+hal ui --port 4173 --host 0.0.0.0
+```
+
+## 🧑‍💻 Programmatic Usage
 
 ```ts
 import { HtmlAssetsLocalizer } from 'html-assets-localizer';
 
 const localizer = new HtmlAssetsLocalizer({
   htmlFilePath: './example.html',
-  targetDir: './output',
+  targetDir: './offline',
 });
 
 const summary = await localizer.process();
 console.log(summary.assets);
 ```
 
-When consuming the library from source, run `pnpm run build` first so the compiled exports in `dist/` are ready. Once published, install the package and import it directly.
+When working from source, run `pnpm run build` first so `dist/` exports are ready. After publishing, simply install the package and import it directly.
 
-## Archived Implementations
+## 💡 Tips
 
-- `archive/js/assets_localizer.js`: original CommonJS implementation for Node.js.
-- `archive/py/assets_localizer.py`: Python version powered by the standard library.
+- Keep a stable network connection while downloading remote assets.
+- The tool respects existing filenames; duplicates receive a numeric suffix to avoid clashes.
+- Use `pnpm run build` again whenever you modify source files under `src/`.
 
-Both are retained for comparison purposes and are no longer actively maintained.
+## 📄 License
 
-## License
-
-MIT License.
+MIT License — enjoy and build amazing offline experiences!

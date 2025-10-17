@@ -34,15 +34,15 @@ export async function launchUiServer(options: LaunchUiServerOptions): Promise<vo
   const origin =
     host === '0.0.0.0' || host === '::' ? `http://127.0.0.1:${actualPort}` : `http://${host}:${actualPort}`;
 
-  console.log(`UI 服务已启动: ${origin}`);
-  console.log('按 Ctrl+C 可退出服务。');
+  console.log(`UI server running at ${origin}`);
+  console.log('Press Ctrl+C to stop the server.');
 
   if (options.openBrowser) {
     try {
       await open(origin);
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
-      console.warn(`自动打开浏览器失败: ${message}`);
+      console.warn(`Failed to open browser automatically: ${message}`);
     }
   }
 
@@ -59,7 +59,7 @@ async function resolveDocsRoot(): Promise<string> {
   try {
     await fs.access(docsPath);
   } catch {
-    throw new Error(`无法找到 docs 目录: ${docsPath}`);
+    throw new Error(`Unable to find docs directory: ${docsPath}`);
   }
   return docsPath;
 }
@@ -78,7 +78,7 @@ async function resolvePort(host: string, preferred?: number): Promise<number> {
         const freePort = addr.port;
         probe.close(() => resolve(freePort));
       } else {
-        probe.close(() => reject(new Error('无法获取空闲端口')));
+        probe.close(() => reject(new Error('Unable to acquire a free port')));
       }
     });
   });
