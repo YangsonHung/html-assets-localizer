@@ -1,224 +1,267 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HTML Assets Localizer - 资源本地化工具</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f8f9fa;
-        }
-        .hero-section {
-            background: linear-gradient(135deg, #6e8efb, #a777e3);
-            color: white;
-            padding: 4rem 0;
-            margin-bottom: 2rem;
-        }
-        .feature-card {
-            height: 100%;
-            transition: transform 0.3s;
-        }
-        .feature-card:hover {
-            transform: translateY(-5px);
-        }
-        .code-block {
-            background-color: #f8f9fa;
-            border-radius: 5px;
-            padding: 1rem;
-            font-family: 'Courier New', Courier, monospace;
-        }
-        .tab-content {
-            border: 1px solid #dee2e6;
-            border-top: none;
-            border-bottom-left-radius: 5px;
-            border-bottom-right-radius: 5px;
-            padding: 1rem;
-            background-color: white;
-        }
-        .log-output {
-            max-height: 220px;
-            overflow-y: auto;
-            background-color: #212529;
-            color: #f8f9fa;
-            font-family: 'Courier New', Courier, monospace;
-            border-radius: 5px;
-            padding: 1rem;
-        }
-        .log-output .text-warning {
-            color: #ffc107 !important;
-        }
-        .log-output .text-danger {
-            color: #f28b82 !important;
-        }
-    </style>
-</head>
-<body>
-    <div class="hero-section">
-        <div class="container">
-            <div class="row">
-                <div class="col-lg-8 mx-auto text-center">
-                    <h1 class="display-4 fw-bold mb-4">HTML Assets Localizer</h1>
-                    <p class="lead mb-4">一个强大的工具，用于将HTML文件中的外部资源（JavaScript、CSS等）本地化，支持Python和Node.js双版本</p>
-                    <div class="d-flex justify-content-center gap-3">
-                        <a href="#installation" class="btn btn-light btn-lg">开始使用</a>
-                        <a href="https://github.com/YangsonHung/html-assets-localizer" class="btn btn-outline-light btn-lg">查看源码</a>
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>HTML Assets Localizer - 资源本地化工具</title>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+        <link href="./index.css" rel="stylesheet" />
+    </head>
+
+    <body>
+        <div class="hero-section">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-8 mx-auto text-center">
+                        <h1 class="display-4 fw-bold mb-4">HTML Assets Localizer</h1>
+                        <p class="lead mb-4">
+                            一个强大的工具，用于将HTML文件中的外部资源（JavaScript、CSS等）本地化，支持Python和Node.js双版本
+                        </p>
+                        <div class="d-flex justify-content-center gap-3">
+                            <a href="#installation" class="btn btn-light btn-lg">开始使用</a>
+                            <a
+                                href="https://github.com/YangsonHung/html-assets-localizer"
+                                class="btn btn-outline-light btn-lg"
+                                >查看源码</a
+                            >
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
 
-    <div class="container mb-5">
-        <div class="row mb-5" id="online-tool">
-            <div class="col-lg-12">
-                <h2 class="text-center mb-4">在线体验 - 本地化您的 HTML</h2>
-                <div class="card shadow-sm">
-                    <div class="card-body">
-                        <p class="text-muted">上传包含外部资源的 HTML 文件，工具会自动下载远程 CSS/JS 资源并替换为本地引用，最终生成完整的压缩包供下载。</p>
-                        <div class="row g-3 align-items-end">
-                            <div class="col-md-6">
-                                <label for="htmlFileInput" class="form-label">选择 HTML 文件</label>
-                                <input type="file" accept=".html,.htm,text/html" class="form-control" id="htmlFileInput">
-                                <div class="form-text">目前支持引用外部 <code>http(s)</code> 资源的 HTML 文件。</div>
+        <div class="container mb-5">
+            <div class="row mb-5" id="online-tool">
+                <div class="col-lg-12">
+                    <h2 class="text-center mb-4">在线体验 - 本地化您的 HTML</h2>
+                    <div class="card shadow-sm">
+                        <div class="card-body">
+                            <p class="text-muted">
+                                上传包含外部资源的 HTML 文件，工具会自动下载远程 CSS/JS
+                                资源并替换为本地引用，最终生成完整的压缩包供下载。
+                            </p>
+                            <div class="row g-3 align-items-end">
+                                <div class="col-md-6">
+                                    <label for="htmlFileInput" class="form-label">选择 HTML 文件</label>
+                                    <input
+                                        type="file"
+                                        accept=".html,.htm,text/html"
+                                        class="form-control"
+                                        id="htmlFileInput"
+                                    />
+                                    <div class="form-text">
+                                        目前支持引用外部 <code>http(s)</code> 资源的 HTML 文件。
+                                    </div>
+                                </div>
+                                <div class="col-md-6 text-md-end">
+                                    <button class="btn btn-primary" id="processButton" disabled>
+                                        处理并下载压缩包
+                                    </button>
+                                    <button class="btn btn-outline-secondary ms-2" id="resetButton" disabled>
+                                        重置
+                                    </button>
+                                </div>
                             </div>
-                            <div class="col-md-6 text-md-end">
-                                <button class="btn btn-primary" id="processButton" disabled>处理并下载压缩包</button>
-                                <button class="btn btn-outline-secondary ms-2" id="resetButton" disabled>重置</button>
-                            </div>
-                        </div>
-                        <div class="alert alert-info mt-3 mb-0" id="selectionInfo" role="alert" style="display: none;"></div>
-                        <div class="mt-4" id="statusContainer" style="display: none;">
-                            <h5 class="mb-3">处理日志</h5>
-                            <div class="log-output" id="logOutput"></div>
-                            <div class="mt-4" id="resourceTableWrapper" style="display: none;">
-                                <h5 class="mb-3">已本地化资源</h5>
-                                <div class="table-responsive">
-                                    <table class="table table-sm align-middle mb-0" id="resourceTable">
-                                        <thead class="table-light">
-                                            <tr>
-                                                <th scope="col">类型</th>
-                                                <th scope="col">原始链接</th>
-                                                <th scope="col">本地路径</th>
-                                                <th scope="col" class="text-end">大小</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody></tbody>
-                                    </table>
+                            <div
+                                class="alert alert-info mt-3 mb-0"
+                                id="selectionInfo"
+                                role="alert"
+                                style="display: none"
+                            ></div>
+                            <div class="mt-4" id="statusContainer" style="display: none">
+                                <h5 class="mb-3">处理日志</h5>
+                                <div class="log-output" id="logOutput"></div>
+                                <div class="mt-4" id="resourceTableWrapper" style="display: none">
+                                    <h5 class="mb-3">已本地化资源</h5>
+                                    <div class="table-responsive">
+                                        <table class="table table-sm align-middle mb-0" id="resourceTable">
+                                            <thead class="table-light">
+                                                <tr>
+                                                    <th scope="col">类型</th>
+                                                    <th scope="col">原始链接</th>
+                                                    <th scope="col">本地路径</th>
+                                                    <th scope="col" class="text-end">大小</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody></tbody>
+                                        </table>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <div class="row mb-5">
-            <div class="col-lg-12">
-                <h2 class="text-center mb-4">功能特性</h2>
-            </div>
-            <div class="col-md-4 mb-4">
-                <div class="card feature-card h-100 shadow-sm">
-                    <div class="card-body text-center">
-                        <div class="mb-3">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="currentColor" class="bi bi-search text-primary" viewBox="0 0 16 16">
-                                <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
-                            </svg>
+            <div class="row mb-5">
+                <div class="col-lg-12">
+                    <h2 class="text-center mb-4">功能特性</h2>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <div class="card feature-card h-100 shadow-sm">
+                        <div class="card-body text-center">
+                            <div class="mb-3">
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    width="48"
+                                    height="48"
+                                    fill="currentColor"
+                                    class="bi bi-search text-primary"
+                                    viewBox="0 0 16 16"
+                                >
+                                    <path
+                                        d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"
+                                    />
+                                </svg>
+                            </div>
+                            <h4 class="card-title">自动检测</h4>
+                            <p class="card-text">自动检测HTML文件中的外部JavaScript和CSS资源</p>
                         </div>
-                        <h4 class="card-title">自动检测</h4>
-                        <p class="card-text">自动检测HTML文件中的外部JavaScript和CSS资源</p>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <div class="card feature-card h-100 shadow-sm">
+                        <div class="card-body text-center">
+                            <div class="mb-3">
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    width="48"
+                                    height="48"
+                                    fill="currentColor"
+                                    class="bi bi-download text-success"
+                                    viewBox="0 0 16 16"
+                                >
+                                    <path
+                                        d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"
+                                    />
+                                    <path
+                                        d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"
+                                    />
+                                </svg>
+                            </div>
+                            <h4 class="card-title">批量下载</h4>
+                            <p class="card-text">批量下载外部资源到本地目录</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <div class="card feature-card h-100 shadow-sm">
+                        <div class="card-body text-center">
+                            <div class="mb-3">
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    width="48"
+                                    height="48"
+                                    fill="currentColor"
+                                    class="bi bi-arrow-repeat text-info"
+                                    viewBox="0 0 16 16"
+                                >
+                                    <path
+                                        d="M11.534 7h3.932a.25.25 0 0 1 .192.41l-1.966 2.36a.25.25 0 0 1-.384 0l-1.966-2.36a.25.25 0 0 1 .192-.41zm-11 2h3.932a.25.25 0 0 0 .192-.41L2.692 6.23a.25.25 0 0 0-.384 0L.342 8.59A.25.25 0 0 0 .534 9z"
+                                    />
+                                    <path
+                                        fill-rule="evenodd"
+                                        d="M8 3c-1.552 0-2.94.707-3.857 1.818a.5.5 0 1 1-.771-.636A6.002 6.002 0 0 1 13.917 7H12.9A5.002 5.002 0 0 0 8 3zM3.1 9a5.002 5.002 0 0 0 8.757 2.182.5.5 0 1 1 .771.636A6.002 6.002 0 0 1 2.083 9H3.1z"
+                                    />
+                                </svg>
+                            </div>
+                            <h4 class="card-title">自动更新</h4>
+                            <p class="card-text">自动更新HTML文件中的资源引用路径</p>
+                        </div>
                     </div>
                 </div>
             </div>
-            <div class="col-md-4 mb-4">
-                <div class="card feature-card h-100 shadow-sm">
-                    <div class="card-body text-center">
-                        <div class="mb-3">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="currentColor" class="bi bi-download text-success" viewBox="0 0 16 16">
-                                <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/>
-                                <path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"/>
-                            </svg>
-                        </div>
-                        <h4 class="card-title">批量下载</h4>
-                        <p class="card-text">批量下载外部资源到本地目录</p>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-4 mb-4">
-                <div class="card feature-card h-100 shadow-sm">
-                    <div class="card-body text-center">
-                        <div class="mb-3">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="currentColor" class="bi bi-arrow-repeat text-info" viewBox="0 0 16 16">
-                                <path d="M11.534 7h3.932a.25.25 0 0 1 .192.41l-1.966 2.36a.25.25 0 0 1-.384 0l-1.966-2.36a.25.25 0 0 1 .192-.41zm-11 2h3.932a.25.25 0 0 0 .192-.41L2.692 6.23a.25.25 0 0 0-.384 0L.342 8.59A.25.25 0 0 0 .534 9z"/>
-                                <path fill-rule="evenodd" d="M8 3c-1.552 0-2.94.707-3.857 1.818a.5.5 0 1 1-.771-.636A6.002 6.002 0 0 1 13.917 7H12.9A5.002 5.002 0 0 0 8 3zM3.1 9a5.002 5.002 0 0 0 8.757 2.182.5.5 0 1 1 .771.636A6.002 6.002 0 0 1 2.083 9H3.1z"/>
-                            </svg>
-                        </div>
-                        <h4 class="card-title">自动更新</h4>
-                        <p class="card-text">自动更新HTML文件中的资源引用路径</p>
-                    </div>
-                </div>
-            </div>
-        </div>
 
-        <div class="row mb-5" id="installation">
-            <div class="col-lg-12">
-                <h2 class="text-center mb-4">安装与使用</h2>
-                <div class="card shadow-sm">
-                    <div class="card-body">
-                        <ul class="nav nav-tabs" id="myTab" role="tablist">
-                            <li class="nav-item" role="presentation">
-                                <button class="nav-link active" id="python-tab" data-bs-toggle="tab" data-bs-target="#python" type="button" role="tab" aria-controls="python" aria-selected="true">Python版本</button>
-                            </li>
-                            <li class="nav-item" role="presentation">
-                                <button class="nav-link" id="nodejs-tab" data-bs-toggle="tab" data-bs-target="#nodejs" type="button" role="tab" aria-controls="nodejs" aria-selected="false">Node.js版本</button>
-                            </li>
-                        </ul>
-                        <div class="tab-content" id="myTabContent">
-                            <div class="tab-pane fade show active" id="python" role="tabpanel" aria-labelledby="python-tab">
-                                <h5 class="mt-3">安装要求</h5>
-                                <ul>
-                                    <li>Python 3.6+</li>
-                                    <li>无需额外依赖，使用标准库</li>
-                                </ul>
-                                <h5 class="mt-4">使用方法</h5>
-                                <div class="code-block">
-                                    <pre># 基本使用
+            <div class="row mb-5" id="installation">
+                <div class="col-lg-12">
+                    <h2 class="text-center mb-4">安装与使用</h2>
+                    <div class="card shadow-sm">
+                        <div class="card-body">
+                            <ul class="nav nav-tabs" id="myTab" role="tablist">
+                                <li class="nav-item" role="presentation">
+                                    <button
+                                        class="nav-link active"
+                                        id="python-tab"
+                                        data-bs-toggle="tab"
+                                        data-bs-target="#python"
+                                        type="button"
+                                        role="tab"
+                                        aria-controls="python"
+                                        aria-selected="true"
+                                    >
+                                        Python版本
+                                    </button>
+                                </li>
+                                <li class="nav-item" role="presentation">
+                                    <button
+                                        class="nav-link"
+                                        id="nodejs-tab"
+                                        data-bs-toggle="tab"
+                                        data-bs-target="#nodejs"
+                                        type="button"
+                                        role="tab"
+                                        aria-controls="nodejs"
+                                        aria-selected="false"
+                                    >
+                                        Node.js版本
+                                    </button>
+                                </li>
+                            </ul>
+                            <div class="tab-content" id="myTabContent">
+                                <div
+                                    class="tab-pane fade show active"
+                                    id="python"
+                                    role="tabpanel"
+                                    aria-labelledby="python-tab"
+                                >
+                                    <h5 class="mt-3">安装要求</h5>
+                                    <ul>
+                                        <li>Python 3.6+</li>
+                                        <li>无需额外依赖，使用标准库</li>
+                                    </ul>
+                                    <h5 class="mt-4">使用方法</h5>
+                                    <div class="code-block">
+                                        <pre>
+# 基本使用
 python assets_localizer.py input.html target_directory
 
 # 示例
-python assets_localizer.py index.html myProject</pre>
+python assets_localizer.py index.html myProject</pre
+                                        >
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="tab-pane fade" id="nodejs" role="tabpanel" aria-labelledby="nodejs-tab">
-                                <h5 class="mt-3">安装要求</h5>
-                                <ul>
-                                    <li>Node.js 12+</li>
-                                    <li>无需额外依赖，使用内置模块</li>
-                                </ul>
-                                <h5 class="mt-4">使用方法</h5>
-                                <div class="code-block">
-                                    <pre># 基本使用
+                                <div class="tab-pane fade" id="nodejs" role="tabpanel" aria-labelledby="nodejs-tab">
+                                    <h5 class="mt-3">安装要求</h5>
+                                    <ul>
+                                        <li>Node.js 12+</li>
+                                        <li>无需额外依赖，使用内置模块</li>
+                                    </ul>
+                                    <h5 class="mt-4">使用方法</h5>
+                                    <div class="code-block">
+                                        <pre>
+# 基本使用
 node assets_localizer.js input.html target_directory
 
 # 示例
-node assets_localizer.js index.html myProject</pre>
+node assets_localizer.js index.html myProject</pre
+                                        >
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <div class="row mb-5">
-            <div class="col-lg-12">
-                <h2 class="text-center mb-4">使用示例</h2>
-                <div class="card shadow-sm">
-                    <div class="card-body">
-                        <h5>输入HTML文件</h5>
-                        <div class="code-block">
-                            <pre>&lt;!DOCTYPE html&gt;
+            <div class="row mb-5">
+                <div class="col-lg-12">
+                    <h2 class="text-center mb-4">使用示例</h2>
+                    <div class="card shadow-sm">
+                        <div class="card-body">
+                            <h5>输入HTML文件</h5>
+                            <div class="code-block">
+                                <pre>
+&lt;!DOCTYPE html&gt;
 &lt;html&gt;
 &lt;head&gt;
     &lt;title&gt;示例页面&lt;/title&gt;
@@ -229,17 +272,19 @@ node assets_localizer.js index.html myProject</pre>
     &lt;h1&gt;Hello World&lt;/h1&gt;
     &lt;script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"&gt;&lt;/script&gt;
 &lt;/body&gt;
-&lt;/html&gt;</pre>
-                        </div>
-                        
-                        <h5 class="mt-4">运行工具</h5>
-                        <div class="code-block">
-                            <pre>python assets_localizer.py example.html myProject</pre>
-                        </div>
-                        
-                        <h5 class="mt-4">输出结构</h5>
-                        <div class="code-block">
-                            <pre>目标目录/
+&lt;/html&gt;</pre
+                                >
+                            </div>
+
+                            <h5 class="mt-4">运行工具</h5>
+                            <div class="code-block">
+                                <pre>python assets_localizer.py example.html myProject</pre>
+                            </div>
+
+                            <h5 class="mt-4">输出结构</h5>
+                            <div class="code-block">
+                                <pre>
+目标目录/
 ├── index.html                # 处理后的HTML文件
 ├── js/                       # JavaScript文件目录
 │   ├── jquery.min.js
@@ -248,47 +293,85 @@ node assets_localizer.js index.html myProject</pre>
 └── css/                      # CSS文件目录
     ├── bootstrap.min.css
     ├── style_def456.css
-    └── main.css</pre>
+    └── main.css</pre
+                                >
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <div class="row mb-5">
-            <div class="col-lg-12">
-                <h2 class="text-center mb-4">作为模块使用</h2>
-                <div class="card shadow-sm">
-                    <div class="card-body">
-                        <ul class="nav nav-tabs" id="moduleTab" role="tablist">
-                            <li class="nav-item" role="presentation">
-                                <button class="nav-link active" id="python-module-tab" data-bs-toggle="tab" data-bs-target="#python-module" type="button" role="tab" aria-controls="python-module" aria-selected="true">Python</button>
-                            </li>
-                            <li class="nav-item" role="presentation">
-                                <button class="nav-link" id="nodejs-module-tab" data-bs-toggle="tab" data-bs-target="#nodejs-module" type="button" role="tab" aria-controls="nodejs-module" aria-selected="false">Node.js</button>
-                            </li>
-                        </ul>
-                        <div class="tab-content" id="moduleTabContent">
-                            <div class="tab-pane fade show active" id="python-module" role="tabpanel" aria-labelledby="python-module-tab">
-                                <div class="code-block mt-3">
-                                    <pre>from assets_localizer import HTMLScriptLocalizer
+            <div class="row mb-5">
+                <div class="col-lg-12">
+                    <h2 class="text-center mb-4">作为模块使用</h2>
+                    <div class="card shadow-sm">
+                        <div class="card-body">
+                            <ul class="nav nav-tabs" id="moduleTab" role="tablist">
+                                <li class="nav-item" role="presentation">
+                                    <button
+                                        class="nav-link active"
+                                        id="python-module-tab"
+                                        data-bs-toggle="tab"
+                                        data-bs-target="#python-module"
+                                        type="button"
+                                        role="tab"
+                                        aria-controls="python-module"
+                                        aria-selected="true"
+                                    >
+                                        Python
+                                    </button>
+                                </li>
+                                <li class="nav-item" role="presentation">
+                                    <button
+                                        class="nav-link"
+                                        id="nodejs-module-tab"
+                                        data-bs-toggle="tab"
+                                        data-bs-target="#nodejs-module"
+                                        type="button"
+                                        role="tab"
+                                        aria-controls="nodejs-module"
+                                        aria-selected="false"
+                                    >
+                                        Node.js
+                                    </button>
+                                </li>
+                            </ul>
+                            <div class="tab-content" id="moduleTabContent">
+                                <div
+                                    class="tab-pane fade show active"
+                                    id="python-module"
+                                    role="tabpanel"
+                                    aria-labelledby="python-module-tab"
+                                >
+                                    <div class="code-block mt-3">
+                                        <pre>
+from assets_localizer import HTMLScriptLocalizer
 
 # 创建实例
 localizer = HTMLScriptLocalizer("input.html", "target_directory")
 
 # 处理文件
-localizer.process()</pre>
+localizer.process()</pre
+                                        >
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="tab-pane fade" id="nodejs-module" role="tabpanel" aria-labelledby="nodejs-module-tab">
-                                <div class="code-block mt-3">
-                                    <pre>const HTMLScriptLocalizer = require('./assets_localizer');
+                                <div
+                                    class="tab-pane fade"
+                                    id="nodejs-module"
+                                    role="tabpanel"
+                                    aria-labelledby="nodejs-module-tab"
+                                >
+                                    <div class="code-block mt-3">
+                                        <pre>
+const HTMLScriptLocalizer = require('./assets_localizer');
 
 // 创建实例
 const localizer = new HTMLScriptLocalizer('input.html', 'target_directory');
 
 // 处理文件
-localizer.process();</pre>
+localizer.process();</pre
+                                        >
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -296,271 +379,39 @@ localizer.process();</pre>
                 </div>
             </div>
         </div>
-    </div>
 
-    <footer class="bg-dark text-white py-4">
-        <div class="container">
-            <div class="row">
-                <div class="col-md-6">
-                    <h5>HTML Assets Localizer</h5>
-                    <p>一个用于将HTML文件中的外部资源本地化的工具</p>
+        <footer class="bg-dark text-white py-4">
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h5>HTML Assets Localizer</h5>
+                        <p>一个用于将HTML文件中的外部资源本地化的工具</p>
+                    </div>
+                    <div class="col-md-3">
+                        <h5>链接</h5>
+                        <ul class="list-unstyled">
+                            <li>
+                                <a href="https://github.com/YangsonHung/html-assets-localizer" class="text-white"
+                                    >GitHub</a
+                                >
+                            </li>
+                            <li><a href="#" class="text-white">文档</a></li>
+                        </ul>
+                    </div>
+                    <div class="col-md-3">
+                        <h5>许可证</h5>
+                        <p>MIT License</p>
+                    </div>
                 </div>
-                <div class="col-md-3">
-                    <h5>链接</h5>
-                    <ul class="list-unstyled">
-                        <li><a href="https://github.com/YangsonHung/html-assets-localizer" class="text-white">GitHub</a></li>
-                        <li><a href="#" class="text-white">文档</a></li>
-                    </ul>
-                </div>
-                <div class="col-md-3">
-                    <h5>许可证</h5>
-                    <p>MIT License</p>
+                <div class="row mt-3">
+                    <div class="col-12 text-center">
+                        <p class="mb-0">&copy; 2025 HTML Assets Localizer. All rights reserved.</p>
+                    </div>
                 </div>
             </div>
-            <div class="row mt-3">
-                <div class="col-12 text-center">
-                    <p class="mb-0">&copy; 2025 HTML Assets Localizer. All rights reserved.</p>
-                </div>
-            </div>
-        </div>
-    </footer>
+        </footer>
 
-        <script type="module">
-        (() => {
-            const fileInput = document.getElementById('htmlFileInput');
-            if (!fileInput) {
-                return;
-            }
-
-            const processButton = document.getElementById('processButton');
-            const resetButton = document.getElementById('resetButton');
-            const selectionInfo = document.getElementById('selectionInfo');
-            const statusContainer = document.getElementById('statusContainer');
-            const logOutput = document.getElementById('logOutput');
-            const resourceTableWrapper = document.getElementById('resourceTableWrapper');
-            const resourceTableBody = document.querySelector('#resourceTable tbody');
-
-            let selectedFile = null;
-
-            fileInput.addEventListener('change', (event) => {
-                const file = event.target.files && event.target.files[0];
-                if (!file) {
-                    resetState();
-                    appendLog('请选择需要处理的 HTML 文件。', 'warning');
-                    return;
-                }
-                selectedFile = file;
-                updateSelectionInfo(file);
-            });
-
-            processButton.addEventListener('click', async () => {
-                await processFile();
-            });
-
-            resetButton.addEventListener('click', () => resetState());
-
-            function updateSelectionInfo(file) {
-                selectionInfo.classList.remove('alert-warning', 'alert-danger');
-                selectionInfo.classList.add('alert-info');
-                selectionInfo.textContent = `已选择文件：${file.name}（${formatBytes(file.size)}）`;
-                selectionInfo.style.display = 'block';
-                processButton.disabled = false;
-                resetButton.disabled = false;
-                appendLog('HTML 文件已准备好，可以开始处理。', 'success');
-            }
-
-            async function processFile() {
-                if (!selectedFile) {
-                    appendLog('请先选择需要处理的 HTML 文件。', 'warning');
-                    return;
-                }
-
-                toggleProcessingState(true);
-                statusContainer.style.display = 'block';
-                appendLog('正在读取文件内容...', 'info');
-
-                try {
-                    const htmlSource = await selectedFile.text();
-                    appendLog('正在请求服务器生成本地化资源...', 'info');
-
-                    const response = await fetch('/api/localize', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({
-                            fileName: selectedFile.name || 'index.html',
-                            htmlContent: htmlSource,
-                        }),
-                    });
-
-                    let payload = null;
-                    try {
-                        payload = await response.json();
-                    } catch (error) {
-                        payload = null;
-                    }
-
-                    if (!response.ok || !payload) {
-                        const message = payload && payload.error ? payload.error : `服务返回状态 ${response.status}`;
-                        throw new Error(message);
-                    }
-
-                    const { summary, zipBase64, zipName } = payload;
-                    appendLog(`检测到 ${summary.totalRemoteResources} 个远程资源，成功本地化 ${summary.localizedResources} 个。`, 'success');
-                    updateResourceTable(summary.assets || []);
-
-                    const blob = base64ToBlob(zipBase64, 'application/zip');
-                    const downloadName = zipName || buildDownloadFileName(selectedFile.name);
-                    triggerDownload(blob, downloadName);
-                    appendLog(`压缩包已生成：${downloadName}`, 'success');
-
-                    if (!summary.localizedResources) {
-                        appendLog('未检测到需要本地化的远程资源，已返回原始 HTML。', 'warning');
-                    }
-                } catch (error) {
-                    const details = error instanceof Error ? error.message : String(error);
-                    appendLog(`处理失败：${details}`, 'danger');
-                } finally {
-                    toggleProcessingState(false);
-                }
-            }
-
-            function resetState() {
-                selectedFile = null;
-                fileInput.value = '';
-                selectionInfo.style.display = 'none';
-                logOutput.innerHTML = '';
-                statusContainer.style.display = 'none';
-                resourceTableBody.innerHTML = '';
-                resourceTableWrapper.style.display = 'none';
-                processButton.disabled = true;
-                resetButton.disabled = true;
-                processButton.innerHTML = '处理并下载压缩包';
-                fileInput.disabled = false;
-            }
-
-            function toggleProcessingState(isProcessing) {
-                fileInput.disabled = isProcessing;
-                processButton.disabled = isProcessing || !selectedFile;
-                resetButton.disabled = isProcessing;
-                if (isProcessing) {
-                    processButton.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>处理中...';
-                } else {
-                    processButton.innerHTML = '处理并下载压缩包';
-                }
-            }
-
-            function updateResourceTable(assets) {
-                if (!assets.length) {
-                    resourceTableWrapper.style.display = 'none';
-                    return;
-                }
-
-                resourceTableBody.innerHTML = '';
-                assets.forEach((asset) => {
-                    const row = document.createElement('tr');
-
-                    const typeCell = document.createElement('td');
-                    typeCell.textContent = asset.type;
-                    row.appendChild(typeCell);
-
-                    const originalUrlCell = document.createElement('td');
-                    originalUrlCell.classList.add('text-break');
-                    const link = document.createElement('a');
-                    link.href = asset.originalUrl;
-                    link.target = '_blank';
-                    link.rel = 'noopener noreferrer';
-                    link.textContent = asset.originalUrl;
-                    originalUrlCell.appendChild(link);
-                    row.appendChild(originalUrlCell);
-
-                    const localPathCell = document.createElement('td');
-                    localPathCell.classList.add('text-break');
-                    localPathCell.textContent = asset.localRelativePath;
-                    row.appendChild(localPathCell);
-
-                    const sizeCell = document.createElement('td');
-                    sizeCell.classList.add('text-end');
-                    sizeCell.textContent = formatBytes(asset.bytesWritten || 0);
-                    row.appendChild(sizeCell);
-
-                    resourceTableBody.appendChild(row);
-                });
-                resourceTableWrapper.style.display = 'block';
-            }
-
-            function appendLog(message, level = 'info') {
-                statusContainer.style.display = 'block';
-                const entry = document.createElement('div');
-                entry.className = `small mb-1 ${getLogClass(level)}`;
-                const timestamp = new Date().toLocaleTimeString();
-                entry.textContent = `[${timestamp}] ${message}`;
-                logOutput.appendChild(entry);
-                logOutput.scrollTop = logOutput.scrollHeight;
-            }
-
-            function getLogClass(level) {
-                switch (level) {
-                    case 'success':
-                        return 'text-success';
-                    case 'warning':
-                        return 'text-warning';
-                    case 'danger':
-                        return 'text-danger';
-                    case 'info':
-                        return 'text-info';
-                    default:
-                        return 'text-secondary';
-                }
-            }
-
-            function base64ToBlob(base64, type) {
-                const binary = atob(base64);
-                const length = binary.length;
-                const bytes = new Uint8Array(length);
-                for (let i = 0; i < length; i += 1) {
-                    bytes[i] = binary.charCodeAt(i);
-                }
-                return new Blob([bytes], { type });
-            }
-
-            function triggerDownload(blob, fileName) {
-                const url = URL.createObjectURL(blob);
-                const link = document.createElement('a');
-                link.href = url;
-                link.download = fileName;
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-                setTimeout(() => URL.revokeObjectURL(url), 2000);
-            }
-
-            function sanitizeFileName(baseName, fallback = 'file') {
-                const sanitized = (baseName || fallback)
-                    .replace(/[\\/:*?"<>|]/g, '_')
-                    .replace(/\s+/g, '_')
-                    .slice(0, 120);
-                return sanitized || fallback;
-            }
-
-            function buildDownloadFileName(fileName) {
-                const baseName = (fileName || 'localized-page').replace(/\.[^.]+$/, '');
-                const sanitized = sanitizeFileName(baseName, 'localized-page');
-                return `${sanitized}-localized.zip`;
-            }
-
-            function formatBytes(bytes) {
-                if (!bytes) {
-                    return '0 B';
-                }
-                const units = ['B', 'KB', 'MB', 'GB'];
-                const exponent = Math.min(Math.floor(Math.log(bytes) / Math.log(1024)), units.length - 1);
-                const value = bytes / Math.pow(1024, exponent);
-                return `${value.toFixed(value >= 10 || exponent === 0 ? 0 : 1)} ${units[exponent]}`;
-            }
-        })();
-    </script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-</body>
+        <script type="module" src="./index.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    </body>
 </html>
