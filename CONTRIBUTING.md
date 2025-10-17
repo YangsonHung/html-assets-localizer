@@ -4,7 +4,7 @@ Thanks for your interest in improving **HTML Assets Localizer**! This document d
 
 ## Prerequisites
 
-- Node.js ≥ 18 (we recommend the latest LTS).
+- Node.js ≥ 20.19 (or the latest 22.x LTS).
 - [pnpm](https://pnpm.io/) (the project uses `pnpm@10.18.3`).
 - Git configured with your GitHub account.
 
@@ -58,8 +58,7 @@ Thanks for your interest in improving **HTML Assets Localizer**! This document d
 5. The GitHub workflow (`.github/workflows/release.yml`) will:
    - install dependencies and run tests,
    - build the project and archive `dist/`,
-   - create a GitHub Release with notes generated from `CHANGELOG.md`,
-   - publish the package to npm (requires `NPM_TOKEN`).
+   - create a GitHub Release with notes generated from `CHANGELOG.md`.
 
 ## Getting an NPM Token
 
@@ -69,6 +68,6 @@ Thanks for your interest in improving **HTML Assets Localizer**! This document d
 4. Copy the token value once it is generated.
 5. In the GitHub repository, go to **Settings → Secrets and variables → Actions → New repository secret**, name it `NPM_TOKEN`, and paste the token value.
 
-> The GitHub Release workflow uses `NPM_TOKEN` to authenticate `npm publish`. Without it, publishes will fail.
+> You only need to configure `NPM_TOKEN` if you intend to run `npm publish` manually or re-enable automated npm publishing in the release workflow.
 
 We appreciate every contribution. Feel free to open an Issue for questions or clarifications before starting major work. Happy coding! 🎉

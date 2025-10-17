@@ -41,6 +41,8 @@ pnpm run build
 ```
 
 > 💡 **Tip**: Unless you modify the source code, you typically only need to compile once.
+>
+> ⚠️ Requires Node.js **20.19+** (or the latest 22.x LTS) because the build pipeline is powered by Vite 7.
 
 ### Global Installation (Recommended)
 
