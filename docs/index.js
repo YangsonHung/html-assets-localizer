@@ -1,215 +1,1066 @@
+
 (() => {
-    const fileInput = document.getElementById('htmlFileInput');
-    if (!fileInput) {
-        return;
+  const selectionVariantClasses = {
+    info: 'border border-sky-400/40 bg-sky-500/10 text-sky-100',
+    success: 'border border-emerald-400/40 bg-emerald-500/10 text-emerald-100',
+    warning: 'border border-amber-400/40 bg-amber-500/10 text-amber-100',
+    danger: 'border border-rose-400/40 bg-rose-500/10 text-rose-100',
+  };
+
+  const selectionVariantClassList = Object.values(selectionVariantClasses).join(' ');
+
+  const logLevelClasses = {
+    success: 'text-emerald-400',
+    warning: 'text-amber-200',
+    danger: 'text-rose-300',
+    info: 'text-sky-300',
+    default: 'text-slate-200',
+  };
+
+  const state = {
+    selectedFile: null,
+    logs: [],
+    assets: [],
+    isProcessing: false,
+    selection: { visible: false, key: null, params: null, variant: 'info', raw: null },
+  };
+
+  const resources = {
+    en: {
+      translation: {
+        hero: {
+          tagline: 'Offline-first localization',
+          title: 'HTML Assets Localizer',
+          lead:
+            'Download every external JavaScript and CSS reference so your HTML keeps working without the network.',
+          primaryCta: 'Try the browser tool',
+          secondaryCta: 'View on GitHub',
+        },
+        language: { label: 'Language' },
+        online: {
+          title: 'Browser playground',
+          description:
+            'Upload an HTML file and get a self-contained zip bundle with every remote asset downloaded and paths rewritten.',
+          helper:
+            'Understands <code>script</code>、<code>link</code>、<code>img</code> tags that use <code>http(s)</code> URLs.',
+          fileLabel: 'Choose HTML file',
+          fileHint: 'Only documents that reference http(s) resources are supported.',
+          buttons: {
+            process: 'Process & download bundle',
+            reset: 'Reset',
+            processing: 'Processing...',
+          },
+          messages: {
+            selectPrompt: 'Please choose the HTML file you want to localize.',
+            selected: 'Selected file: {{fileName}} ({{fileSize}}).',
+            coreMissing:
+              'Unable to initialize the browser localizer. Please check your network connection and refresh later.',
+            runtimeUnavailable: 'The localization runtime is not ready yet. Please refresh the page.',
+          },
+          logs: {
+            title: 'Processing log',
+            fileReady: 'The HTML file is ready. You can start the localization run.',
+            reading: 'Reading file contents...',
+            parsing: 'Parsing markup and downloading remote resources...',
+            summary: 'Found {{total}} remote asset(s), localized {{localized}}.',
+            archiveReady: 'Archive generated: {{fileName}}.',
+            noResources: 'No remote resources detected. The original HTML was added to the archive.',
+            failure: 'Processing failed: {{details}}',
+            coreMissing: 'BrowserHtmlAssetsLocalizer is missing on window.HtmlAssetsLocalizer.',
+          },
+          resources: {
+            title: 'Localized assets',
+            headers: {
+              type: 'Type',
+              original: 'Original URL',
+              local: 'Local path',
+              size: 'Size',
+            },
+          },
+        },
+        features: {
+          title: 'Core capabilities',
+          subtitle:
+            'Based on the project README, these highlights cover what matters most when localizing HTML assets.',
+          items: [
+            {
+              icon: '🚀',
+              title: 'Fast localization',
+              description: 'Automatically detects every external JavaScript or CSS asset.',
+            },
+            {
+              icon: '🎯',
+              title: 'Smart rewrites',
+              description: 'Rewrites markup so pages keep working completely offline.',
+            },
+            {
+              icon: '💻',
+              title: 'CLI + UI',
+              description: 'Offers both a command-line workflow and a visual interface.',
+            },
+            {
+              icon: '🔧',
+              title: 'Configurable',
+              description: 'Customize output folders, file naming, and runtime options.',
+            },
+          ],
+        },
+        installation: {
+          title: 'Installation',
+          subtitle: 'Follow the same setup paths described in the README.',
+          cards: [
+            {
+              badge: 'Local development',
+              title: 'Clone and build once',
+              description: 'Work directly with the TypeScript source code.',
+              code:
+                '# Clone the repository\n' +
+                'git clone https://github.com/YangsonHung/html-assets-localizer.git\n' +
+                'cd html-assets-localizer\n\n' +
+                '# Install dependencies\n' +
+                'pnpm install\n\n' +
+                '# Compile TypeScript\n' +
+                'pnpm run build',
+              notes: [
+                'Requires Node.js 20.19+ (or the latest 22.x LTS).',
+                'Vite 7 powers the build pipeline.',
+              ],
+            },
+            {
+              badge: 'Global install',
+              title: 'Install the CLI everywhere',
+              description: 'Use the published package from any JavaScript ecosystem.',
+              code:
+                '# pnpm\n' +
+                'pnpm add -g html-assets-localizer\n\n' +
+                '# npm\n' +
+                'npm install -g html-assets-localizer\n\n' +
+                '# yarn\n' +
+                'yarn global add html-assets-localizer',
+              notes: [
+                'After installation run `html-assets-localizer` or the shorthand `hal` from any directory.',
+              ],
+            },
+          ],
+        },
+        cli: {
+          title: 'CLI workflow',
+          subtitle: 'Automate localization right from the terminal.',
+          sections: [
+            {
+              title: 'Basic usage',
+              description: 'Process an HTML source file and write the offline bundle to a target folder.',
+              code:
+                '# Full command\n' +
+                'html-assets-localizer <html-file> <output-dir>\n\n' +
+                '# Shorthand\n' +
+                'hal <html-file> <output-dir>',
+            },
+            {
+              title: 'What you get',
+              list: [
+                'Creates `js/` and `css/` subfolders under the output directory.',
+                'Downloads every remote asset into the proper folder.',
+                'Generates a new HTML file with paths rewritten to local references.',
+              ],
+            },
+          ],
+          commands: {
+            title: 'Handy commands',
+            description: 'The CLI exposes the same helpers referenced in the README.',
+            headers: {
+              command: 'Command',
+              description: 'Description',
+            },
+            items: [
+              { command: 'hal help', description: 'Show usage information.' },
+              { command: 'hal version', description: 'Print the installed version.' },
+              { command: 'hal ui', description: 'Launch the visual UI.' },
+            ],
+          },
+        },
+        ui: {
+          title: 'UI mode',
+          subtitle: 'Launch the browser interface for teammates who prefer GUI workflows.',
+          cards: [
+            {
+              title: 'Start instantly',
+              description: 'Let the CLI choose a free port and open the UI automatically.',
+              code: 'hal ui',
+            },
+            {
+              title: 'Custom configuration',
+              description: 'Specify host, port, or disable auto-open for remote environments.',
+              code:
+                '# Pick port and host\n' +
+                'hal ui --port 4173 --host 0.0.0.0\n\n' +
+                '# Start without opening a browser\n' +
+                'hal ui --no-open',
+            },
+          ],
+        },
+        output: {
+          title: 'Output structure',
+          subtitle: 'Every run mirrors the structure documented in the README.',
+          structure:
+            'output-dir/\n' +
+            '├── index.html          # HTML file with updated paths\n' +
+            '├── js/                 # JavaScript resources directory\n' +
+            '│   ├── jquery.min.js\n' +
+            '│   ├── bootstrap.min.js\n' +
+            '│   └── app.js\n' +
+            '└── css/                # CSS resources directory\n' +
+            '    ├── bootstrap.min.css\n' +
+            '    ├── style.css\n' +
+            '    └── theme.css',
+        },
+        tips: {
+          title: 'Tips & good habits',
+          columns: [
+            {
+              title: 'Performance',
+              items: [
+                'Keep the network stable to avoid interrupted downloads.',
+                'Start with a single HTML file when localizing large sites.',
+              ],
+            },
+            {
+              title: 'Troubleshooting',
+              items: [
+                'Filename conflicts receive numeric suffixes automatically.',
+                'If a download times out, verify connectivity and retry.',
+              ],
+            },
+            {
+              title: 'Best practices',
+              items: [
+                'Commit generated offline bundles when they are part of a release.',
+                'Test the localized output locally before distribution.',
+              ],
+            },
+          ],
+        },
+        links: {
+          contribute: {
+            title: 'Contribute & feedback',
+            description: 'Issues and pull requests are welcome—see the contribution guide in the repo.',
+            cta: 'Open repository',
+          },
+          resources: {
+            title: 'Useful links',
+            items: [
+              { label: 'NPM package', url: 'https://www.npmjs.com/package/html-assets-localizer' },
+              { label: 'GitHub repository', url: 'https://github.com/YangsonHung/html-assets-localizer' },
+              { label: 'Chinese documentation', url: 'https://github.com/YangsonHung/html-assets-localizer/blob/main/README.zh.md' },
+            ],
+          },
+          license: {
+            title: 'License',
+            description: 'Released under the MIT License.',
+          },
+        },
+        footer: {
+          summary:
+            'HTML Assets Localizer keeps HTML truly offline by downloading remote resources and rewriting references automatically.',
+          copyright: '© 2025 HTML Assets Localizer. All rights reserved.',
+        },
+      },
+    },
+    zh: {
+      translation: {
+        hero: {
+          tagline: '专为离线而生的本地化工具',
+          title: 'HTML Assets Localizer',
+          lead: '自动下载 HTML 中的外部 JS/CSS 引用并重写路径，让页面在无网络环境下依旧可用。',
+          primaryCta: '体验浏览器工具',
+          secondaryCta: '查看 GitHub',
+        },
+        language: { label: '选择语言' },
+        online: {
+          title: '浏览器试玩',
+          description: '上传包含外部资源的 HTML，浏览器端会下载依赖并生成可离线使用的压缩包。',
+          helper: '兼容 <code>script</code>、<code>link</code>、<code>img</code> 中的 <code>http(s)</code> 资源，与 README 描述一致。',
+          fileLabel: '选择 HTML 文件',
+          fileHint: '目前仅支持引用 http(s) 资源的页面。',
+          buttons: {
+            process: '本地化并下载压缩包',
+            reset: '重置',
+            processing: '处理中...',
+          },
+          messages: {
+            selectPrompt: '请先选择需要处理的 HTML 文件。',
+            selected: '已选择文件：{{fileName}}（{{fileSize}}）。',
+            coreMissing: '无法加载浏览器端本地化核心，请检查网络后刷新页面重试。',
+            runtimeUnavailable: '本地化运行时尚未就绪，请刷新页面后重试。',
+          },
+          logs: {
+            title: '处理日志',
+            fileReady: 'HTML 文件已就绪，可以开始本地化。',
+            reading: '正在读取文件内容...',
+            parsing: '正在解析标记并下载远程资源...',
+            summary: '检测到 {{total}} 个远程资源，成功本地化 {{localized}} 个。',
+            archiveReady: '压缩包已生成：{{fileName}}。',
+            noResources: '未检测到远程资源，已将原始 HTML 写入压缩包。',
+            failure: '处理失败：{{details}}',
+            coreMissing: '未能在 window.HtmlAssetsLocalizer 上找到 BrowserHtmlAssetsLocalizer。',
+          },
+          resources: {
+            title: '已本地化资源',
+            headers: {
+              type: '类型',
+              original: '原始链接',
+              local: '本地路径',
+              size: '大小',
+            },
+          },
+        },
+        features: {
+          title: '核心特性',
+          subtitle: '依据 README 梳理的重点能力，帮助你快速了解本地化流程。',
+          items: [
+            {
+              icon: '🚀',
+              title: '快速本地化',
+              description: '自动发现所有外部 JavaScript 与 CSS 资源。',
+            },
+            {
+              icon: '🎯',
+              title: '智能重写',
+              description: '自动更新 HTML 引用路径，确保离线可用。',
+            },
+            {
+              icon: '💻',
+              title: '双重体验',
+              description: '同时提供命令行与可视化界面两种模式。',
+            },
+            {
+              icon: '🔧',
+              title: '灵活可配',
+              description: '可按需调整输出目录、命名与运行参数。',
+            },
+          ],
+        },
+        installation: {
+          title: '安装方式',
+          subtitle: '与 README 保持一致的两条路径：开发调试或全局安装。',
+          cards: [
+            {
+              badge: '本地开发',
+              title: '克隆并编译',
+              description: '适合需要修改源码或调试的场景。',
+              code:
+                '# 克隆仓库\n' +
+                'git clone https://github.com/YangsonHung/html-assets-localizer.git\n' +
+                'cd html-assets-localizer\n\n' +
+                '# 安装依赖\n' +
+                'pnpm install\n\n' +
+                '# 编译 TypeScript\n' +
+                'pnpm run build',
+              notes: ['需要 Node.js 20.19+（或 22.x LTS）。', '构建流程由 Vite 7 驱动。'],
+            },
+            {
+              badge: '全局安装',
+              title: '安装 CLI',
+              description: '使用熟悉的包管理器安装即可。',
+              code:
+                '# 使用 pnpm\n' +
+                'pnpm add -g html-assets-localizer\n\n' +
+                '# 使用 npm\n' +
+                'npm install -g html-assets-localizer\n\n' +
+                '# 使用 yarn\n' +
+                'yarn global add html-assets-localizer',
+              notes: ['安装后可在任意目录运行 `html-assets-localizer` 或 `hal`。'],
+            },
+          ],
+        },
+        cli: {
+          title: 'CLI 工作流',
+          subtitle: '命令行依旧是 README 推荐的主力流程。',
+          sections: [
+            {
+              title: '基础用法',
+              description: '传入 HTML 源文件与输出目录即可启动本地化。',
+              code:
+                '# 完整命令\n' +
+                'html-assets-localizer <html-file> <output-dir>\n\n' +
+                '# 简写命令\n' +
+                'hal <html-file> <output-dir>',
+            },
+            {
+              title: '输出结果',
+              list: [
+                '在目标目录创建 `js/` 与 `css/` 子目录。',
+                '下载所有外部资源到对应目录。',
+                '生成路径已重写的新 HTML 文件。',
+              ],
+            },
+          ],
+          commands: {
+            title: '常用命令',
+            description: '与 README 中的指令保持一致。',
+            headers: { command: '命令', description: '说明' },
+            items: [
+              { command: 'hal help', description: '查看帮助信息。' },
+              { command: 'hal version', description: '查看当前版本。' },
+              { command: 'hal ui', description: '启动可视化界面。' },
+            ],
+          },
+        },
+        ui: {
+          title: '可视化界面',
+          subtitle: '为偏好 GUI 的同事提供即开即用的浏览器体验。',
+          cards: [
+            {
+              title: '快速启动',
+              description: '自动选择端口并打开浏览器。',
+              code: 'hal ui',
+            },
+            {
+              title: '自定义参数',
+              description: '按需指定主机、端口或关闭自动打开浏览器。',
+              code:
+                '# 指定端口与主机\n' +
+                'hal ui --port 4173 --host 0.0.0.0\n\n' +
+                '# 不自动打开浏览器\n' +
+                'hal ui --no-open',
+            },
+          ],
+        },
+        output: {
+          title: '输出结构',
+          subtitle: '最终产物与 README 中的结构完全一致。',
+          structure:
+            'output-dir/\n' +
+            '├── index.html          # 路径已更新的 HTML 文件\n' +
+            '├── js/                 # JavaScript 资源目录\n' +
+            '│   ├── jquery.min.js\n' +
+            '│   ├── bootstrap.min.js\n' +
+            '│   └── app.js\n' +
+            '└── css/                # CSS 资源目录\n' +
+            '    ├── bootstrap.min.css\n' +
+            '    ├── style.css\n' +
+            '    └── theme.css',
+        },
+        tips: {
+          title: '技巧与实践',
+          columns: [
+            {
+              title: '性能',
+              items: ['保持网络稳定。', '大型项目可先处理单个页面。'],
+            },
+            {
+              title: '排查',
+              items: ['文件名冲突会自动加后缀。', '下载超时请检查网络后重试。'],
+            },
+            {
+              title: '建议',
+              items: ['可将离线包纳入版本管理。', '分发前请在本地验证结果。'],
+            },
+          ],
+        },
+        links: {
+          contribute: {
+            title: '贡献与反馈',
+            description: '欢迎提交 Issue 或 PR，详细流程见仓库贡献指南。',
+            cta: '打开仓库',
+          },
+          resources: {
+            title: '相关链接',
+            items: [
+              { label: 'NPM Package', url: 'https://www.npmjs.com/package/html-assets-localizer' },
+              { label: 'GitHub 仓库', url: 'https://github.com/YangsonHung/html-assets-localizer' },
+              { label: 'English README', url: 'https://github.com/YangsonHung/html-assets-localizer/blob/main/README.md' },
+            ],
+          },
+          license: {
+            title: '许可证',
+            description: '项目采用 MIT License 开源。',
+          },
+        },
+        footer: {
+          summary: 'HTML Assets Localizer 自动下载远程资源并重写引用，让页面随时离线可用。',
+          copyright: '© 2025 HTML Assets Localizer. 保留所有权利。',
+        },
+      },
+    },
+  };
+
+  const refs = {};
+
+  document.addEventListener('DOMContentLoaded', () => {
+    refs.fileInput = document.getElementById('htmlFileInput');
+    refs.processButton = document.getElementById('processButton');
+    refs.resetButton = document.getElementById('resetButton');
+    refs.selectionInfo = document.getElementById('selectionInfo');
+    refs.statusContainer = document.getElementById('statusContainer');
+    refs.logOutput = document.getElementById('logOutput');
+    refs.resourceTableWrapper = document.getElementById('resourceTableWrapper');
+    refs.resourceTableBody = document.querySelector('#resourceTable tbody');
+
+    const defaultLanguage = determineDefaultLanguage();
+
+    if (!window.i18next) {
+      console.error('i18next failed to load.');
+      return;
     }
 
-    const processButton = document.getElementById('processButton');
-    const resetButton = document.getElementById('resetButton');
-    const selectionInfo = document.getElementById('selectionInfo');
-    const statusContainer = document.getElementById('statusContainer');
-    const logOutput = document.getElementById('logOutput');
-    const resourceTableWrapper = document.getElementById('resourceTableWrapper');
-    const resourceTableBody = document.querySelector('#resourceTable tbody');
+    i18next
+      .init({
+        lng: defaultLanguage,
+        fallbackLng: 'en',
+        resources,
+      })
+      .then(() => {
+        setupLanguageToggle();
+        initOnlineTool();
+        updateLanguageUI();
+      })
+      .catch((error) => {
+        console.error('Failed to initialize i18next:', error);
+      });
+  });
 
+  function determineDefaultLanguage() {
+    const locale = (navigator.language || 'en').toLowerCase();
+    return locale.startsWith('zh') ? 'zh' : 'en';
+  }
+
+  function setupLanguageToggle() {
+    document.querySelectorAll('.lang-toggle').forEach((button) => {
+      button.addEventListener('click', () => {
+        const targetLang = button.dataset.lang;
+        if (targetLang && targetLang !== i18next.language) {
+          i18next.changeLanguage(targetLang);
+        }
+      });
+    });
+
+    i18next.on('languageChanged', () => {
+      updateLanguageUI();
+    });
+  }
+
+  function updateLanguageUI() {
+    document.documentElement.lang = i18next.language === 'zh' ? 'zh-CN' : 'en';
+    document.title = i18next.t('hero.title');
+
+    updateLanguageButtons();
+    updateStaticTexts();
+    renderFeatures();
+    renderInstallationCards();
+    renderCLISections();
+    renderCLITable();
+    renderUICards();
+    renderTipsGrid();
+    renderResourceLinks();
+    renderCodeSamples();
+    renderSelection();
+    renderLogs();
+    renderResourceTable();
+    updateProcessButtonState();
+  }
+  function updateLanguageButtons() {
+    document.querySelectorAll('.lang-toggle').forEach((button) => {
+      const isActive = button.dataset.lang === i18next.language;
+      button.setAttribute('aria-pressed', String(isActive));
+      button.classList.toggle('bg-white', isActive);
+      button.classList.toggle('text-slate-950', isActive);
+      button.classList.toggle('shadow-brand-glow', isActive);
+      button.classList.toggle('text-slate-200', !isActive);
+    });
+  }
+
+  function updateStaticTexts() {
+    document.querySelectorAll('[data-i18n]').forEach((node) => {
+      const key = node.getAttribute('data-i18n');
+      node.textContent = key ? i18next.t(key) : '';
+    });
+    document.querySelectorAll('[data-i18n-html]').forEach((node) => {
+      const key = node.getAttribute('data-i18n-html');
+      node.innerHTML = key ? i18next.t(key) : '';
+    });
+  }
+
+  function renderFeatures() {
+    const container = document.getElementById('featureGrid');
+    if (!container) return;
+    const items = i18next.t('features.items', { returnObjects: true });
+    container.innerHTML = '';
+    items.forEach((item) => {
+      const card = document.createElement('div');
+      card.className =
+        'group rounded-3xl border border-white/10 bg-white/5 p-8 shadow-lg shadow-black/30 transition hover:border-brand-300/60 hover:bg-brand-400/10';
+
+      const icon = document.createElement('div');
+      icon.className =
+        'flex h-12 w-12 items-center justify-center rounded-2xl bg-brand-500/20 text-brand-200 transition group-hover:text-brand-100 text-2xl';
+      icon.textContent = item.icon || '';
+
+      const title = document.createElement('h3');
+      title.className = 'mt-6 text-xl font-semibold text-white';
+      title.textContent = item.title || '';
+
+      const description = document.createElement('p');
+      description.className = 'mt-3 text-sm leading-relaxed text-slate-300';
+      description.textContent = item.description || '';
+
+      card.append(icon, title, description);
+      container.append(card);
+    });
+  }
+
+  function renderInstallationCards() {
+    const container = document.getElementById('installationCards');
+    if (!container) return;
+    const cards = i18next.t('installation.cards', { returnObjects: true });
+    container.innerHTML = '';
+    cards.forEach((data) => {
+      const card = document.createElement('div');
+      card.className =
+        'rounded-3xl border border-white/10 bg-slate-900/70 p-8 shadow-lg shadow-black/30';
+
+      const badge = document.createElement('span');
+      badge.className =
+        'inline-flex items-center rounded-full bg-brand-500/20 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-brand-100';
+      badge.textContent = data.badge || '';
+
+      const title = document.createElement('h3');
+      title.className = 'mt-4 text-xl font-semibold text-white';
+      title.textContent = data.title || '';
+
+      const description = document.createElement('p');
+      description.className = 'mt-3 text-sm leading-relaxed text-slate-300';
+      description.textContent = data.description || '';
+
+      const codeBlock = document.createElement('pre');
+      codeBlock.className =
+        'scrollbar-thin mt-6 overflow-x-auto rounded-2xl border border-slate-700/60 bg-slate-950/70 p-5 text-sm leading-relaxed text-slate-200 font-mono';
+      const code = document.createElement('code');
+      code.textContent = data.code || '';
+      codeBlock.append(code);
+
+      card.append(badge, title, description, codeBlock);
+
+      if (Array.isArray(data.notes) && data.notes.length) {
+        const list = document.createElement('ul');
+        list.className = 'mt-4 list-disc space-y-2 pl-6 text-sm text-slate-300';
+        data.notes.forEach((note) => {
+          const item = document.createElement('li');
+          item.textContent = note;
+          list.append(item);
+        });
+        card.append(list);
+      }
+
+      container.append(card);
+    });
+  }
+
+  function renderCLISections() {
+    const container = document.getElementById('cliContent');
+    if (!container) return;
+    const sections = i18next.t('cli.sections', { returnObjects: true });
+    container.innerHTML = '';
+    sections.forEach((section) => {
+      const card = document.createElement('div');
+      card.className =
+        'rounded-3xl border border-white/10 bg-slate-900/70 p-8 shadow-lg shadow-black/30';
+
+      const title = document.createElement('h3');
+      title.className = 'text-xl font-semibold text-white';
+      title.textContent = section.title || '';
+      card.append(title);
+
+      if (section.description) {
+        const description = document.createElement('p');
+        description.className = 'mt-3 text-sm leading-relaxed text-slate-300';
+        description.textContent = section.description;
+        card.append(description);
+      }
+
+      if (section.code) {
+        const codeBlock = document.createElement('pre');
+        codeBlock.className =
+          'scrollbar-thin mt-6 overflow-x-auto rounded-2xl border border-slate-700/60 bg-slate-950/70 p-5 text-sm leading-relaxed text-slate-200 font-mono';
+        const code = document.createElement('code');
+        code.textContent = section.code;
+        codeBlock.append(code);
+        card.append(codeBlock);
+      }
+
+      if (Array.isArray(section.list) && section.list.length) {
+        const list = document.createElement('ul');
+        list.className = 'mt-6 list-disc space-y-2 pl-6 text-sm text-slate-300';
+        section.list.forEach((entry) => {
+          const item = document.createElement('li');
+          item.textContent = entry;
+          list.append(item);
+        });
+        card.append(list);
+      }
+
+      container.append(card);
+    });
+  }
+
+  function renderCLITable() {
+    const tbody = document.getElementById('cliCommandTable');
+    if (!tbody) return;
+    const rows = i18next.t('cli.commands.items', { returnObjects: true });
+    tbody.innerHTML = '';
+    rows.forEach((row) => {
+      const tr = document.createElement('tr');
+
+      const commandCell = document.createElement('td');
+      commandCell.className = 'px-4 py-3 align-top font-mono text-slate-200';
+      commandCell.textContent = row.command || '';
+
+      const descriptionCell = document.createElement('td');
+      descriptionCell.className = 'px-4 py-3 align-top text-slate-300';
+      descriptionCell.textContent = row.description || '';
+
+      tr.append(commandCell, descriptionCell);
+      tbody.append(tr);
+    });
+  }
+
+  function renderUICards() {
+    const container = document.getElementById('uiCards');
+    if (!container) return;
+    const cards = i18next.t('ui.cards', { returnObjects: true });
+    container.innerHTML = '';
+    cards.forEach((data) => {
+      const card = document.createElement('div');
+      card.className =
+        'rounded-3xl border border-white/10 bg-slate-900/70 p-8 shadow-lg shadow-black/30';
+
+      const title = document.createElement('h3');
+      title.className = 'text-xl font-semibold text-white';
+      title.textContent = data.title || '';
+
+      const description = document.createElement('p');
+      description.className = 'mt-3 text-sm leading-relaxed text-slate-300';
+      description.textContent = data.description || '';
+
+      const codeBlock = document.createElement('pre');
+      codeBlock.className =
+        'scrollbar-thin mt-6 overflow-x-auto rounded-2xl border border-slate-700/60 bg-slate-950/70 p-5 text-sm leading-relaxed text-slate-200 font-mono';
+      const code = document.createElement('code');
+      code.textContent = data.code || '';
+      codeBlock.append(code);
+
+      card.append(title, description, codeBlock);
+      container.append(card);
+    });
+  }
+
+  function renderTipsGrid() {
+    const container = document.getElementById('tipsGrid');
+    if (!container) return;
+    const columns = i18next.t('tips.columns', { returnObjects: true });
+    container.innerHTML = '';
+    columns.forEach((column) => {
+      const card = document.createElement('div');
+      card.className =
+        'rounded-3xl border border-white/10 bg-white/5 p-6 shadow-lg shadow-black/30';
+
+      const title = document.createElement('h3');
+      title.className = 'text-lg font-semibold text-white';
+      title.textContent = column.title || '';
+      card.append(title);
+
+      if (Array.isArray(column.items) && column.items.length) {
+        const list = document.createElement('ul');
+        list.className = 'mt-4 space-y-2 text-sm text-slate-300';
+        column.items.forEach((item) => {
+          const entry = document.createElement('li');
+          entry.textContent = item;
+          list.append(entry);
+        });
+        card.append(list);
+      }
+
+      container.append(card);
+    });
+  }
+
+  function renderResourceLinks() {
+    const container = document.getElementById('resourceLinks');
+    if (!container) return;
+    const items = i18next.t('links.resources.items', { returnObjects: true });
+    container.innerHTML = '';
+    items.forEach((item) => {
+      const li = document.createElement('li');
+      const link = document.createElement('a');
+      link.href = item.url || '#';
+      link.target = '_blank';
+      link.rel = 'noopener noreferrer';
+      link.className = 'text-sky-300 hover:text-sky-100 transition';
+      link.textContent = item.label || '';
+      li.append(link);
+      container.append(li);
+    });
+  }
+
+  function renderCodeSamples() {
+    document.querySelectorAll('[data-i18n-code]').forEach((node) => {
+      const key = node.getAttribute('data-i18n-code');
+      node.textContent = key ? i18next.t(key) : '';
+    });
+  }
+
+  function initOnlineTool() {
     const library = window.HtmlAssetsLocalizer;
     if (!library || !library.BrowserHtmlAssetsLocalizer) {
-        if (statusContainer) {
-            statusContainer.style.display = 'block';
-        }
-        if (logOutput) {
-            const entry = document.createElement('div');
-            entry.className = 'small text-danger';
-            entry.textContent = '未能加载本地化核心脚本，请检查网络或稍后重试。';
-            logOutput.appendChild(entry);
-        }
-        console.error('BrowserHtmlAssetsLocalizer is not available on window.HtmlAssetsLocalizer.');
-        fileInput.disabled = true;
-        if (processButton) {
-            processButton.disabled = true;
-        }
-        if (resetButton) {
-            resetButton.disabled = true;
-        }
-        return;
+      setSelection({ key: 'online.messages.coreMissing', variant: 'danger' });
+      appendLog({ key: 'online.logs.coreMissing', level: 'danger' });
+      disableControls();
+      return;
     }
 
-    const { BrowserHtmlAssetsLocalizer } = library;
-    let selectedFile = null;
+    state.browserCtor = library.BrowserHtmlAssetsLocalizer;
 
-    fileInput.addEventListener('change', (event) => {
-        const file = event.target.files && event.target.files[0];
-        if (!file) {
-            resetState();
-            appendLog('请选择需要处理的 HTML 文件。', 'warning');
-            return;
-        }
-        selectedFile = file;
-        updateSelectionInfo(file);
+    refs.fileInput?.addEventListener('change', handleFileChange);
+    refs.processButton?.addEventListener('click', () => void processFile());
+    refs.resetButton?.addEventListener('click', resetState);
+  }
+
+  function handleFileChange(event) {
+    const file = event.target.files && event.target.files[0];
+    if (!file) {
+      resetState();
+      setSelection({ key: 'online.messages.selectPrompt', variant: 'warning' });
+      appendLog({ key: 'online.messages.selectPrompt', level: 'warning' });
+      return;
+    }
+    state.selectedFile = file;
+    setSelection({
+      key: 'online.messages.selected',
+      variant: 'info',
+      params: { fileName: file.name, fileSize: formatBytes(file.size) },
     });
+    appendLog({ key: 'online.logs.fileReady', level: 'success' });
+    refs.resetButton && (refs.resetButton.disabled = false);
+    updateProcessButtonState();
+  }
 
-    processButton.addEventListener('click', async () => {
-        await processFile();
+  async function processFile() {
+    if (!state.browserCtor) {
+      appendLog({ key: 'online.messages.runtimeUnavailable', level: 'danger' });
+      return;
+    }
+    if (!state.selectedFile) {
+      setSelection({ key: 'online.messages.selectPrompt', variant: 'warning' });
+      appendLog({ key: 'online.messages.selectPrompt', level: 'warning' });
+      return;
+    }
+
+    toggleProcessingState(true);
+    showStatusContainer();
+    appendLog({ key: 'online.logs.reading', level: 'info' });
+
+    try {
+      const htmlSource = await state.selectedFile.text();
+      appendLog({ key: 'online.logs.parsing', level: 'info' });
+
+      const localizer = new state.browserCtor({
+        htmlContent: htmlSource,
+        htmlFileName: state.selectedFile.name || 'index.html',
+      });
+
+      const result = await localizer.process();
+      const { summary, zipBlob, zipFileName } = result;
+
+      appendLog({
+        key: 'online.logs.summary',
+        level: 'success',
+        params: { total: summary.totalRemoteResources, localized: summary.localizedResources },
+      });
+
+      updateResourceTable(summary.assets || []);
+      triggerDownload(zipBlob, zipFileName);
+      appendLog({
+        key: 'online.logs.archiveReady',
+        level: 'success',
+        params: { fileName: zipFileName },
+      });
+
+      if (!summary.localizedResources) {
+        appendLog({ key: 'online.logs.noResources', level: 'warning' });
+      }
+    } catch (error) {
+      const details = error instanceof Error ? error.message : String(error);
+      appendLog({ key: 'online.logs.failure', level: 'danger', params: { details } });
+    } finally {
+      toggleProcessingState(false);
+    }
+  }
+
+  function resetState() {
+    state.selectedFile = null;
+    state.logs = [];
+    state.assets = [];
+    state.selection = { visible: false, key: null, params: null, variant: 'info', raw: null };
+    if (refs.fileInput) {
+      refs.fileInput.value = '';
+      refs.fileInput.disabled = false;
+    }
+    refs.processButton && (refs.processButton.disabled = true);
+    refs.resetButton && (refs.resetButton.disabled = true);
+    refs.statusContainer?.classList.add('hidden');
+    renderLogs();
+    renderResourceTable();
+    renderSelection();
+    updateProcessButtonState();
+  }
+
+  function toggleProcessingState(isProcessing) {
+    state.isProcessing = isProcessing;
+    refs.fileInput && (refs.fileInput.disabled = isProcessing);
+    refs.resetButton && (refs.resetButton.disabled = isProcessing);
+    updateProcessButtonState();
+  }
+
+  function updateProcessButtonState() {
+    if (!refs.processButton) return;
+    const disabled = state.isProcessing || !state.selectedFile || !state.browserCtor;
+    refs.processButton.disabled = disabled;
+    if (state.isProcessing) {
+      refs.processButton.innerHTML = `${buildSpinnerMarkup()}${i18next.t('online.buttons.processing')}`;
+    } else {
+      refs.processButton.textContent = i18next.t('online.buttons.process');
+    }
+  }
+
+  function buildSpinnerMarkup() {
+    return '<span class="mr-3 inline-block h-4 w-4 animate-spin rounded-full border-2 border-white/40 border-t-transparent align-middle"></span>';
+  }
+
+  function showStatusContainer() {
+    refs.statusContainer?.classList.remove('hidden');
+  }
+
+  function setSelection({ key, params, variant = 'info', raw = null, visible = true }) {
+    state.selection = { key, params, variant, raw, visible };
+    renderSelection();
+  }
+
+  function renderSelection() {
+    if (!refs.selectionInfo) return;
+    const { visible, key, params, variant, raw } = state.selection;
+    if (!visible) {
+      refs.selectionInfo.className =
+        'mt-8 hidden rounded-2xl px-4 py-3 text-sm leading-relaxed shadow-lg shadow-black/20';
+      refs.selectionInfo.textContent = '';
+      return;
+    }
+    refs.selectionInfo.className = `mt-8 rounded-2xl px-4 py-3 text-sm leading-relaxed shadow-lg shadow-black/20 ${selectionVariantClasses[variant] || selectionVariantClasses.info}`;
+    if (raw) {
+      refs.selectionInfo.textContent = raw;
+    } else if (key) {
+      refs.selectionInfo.textContent = i18next.t(key, params || {});
+    } else {
+      refs.selectionInfo.textContent = '';
+    }
+  }
+
+  function appendLog({ key, level = 'info', params = null, raw = null }) {
+    state.logs.push({
+      key,
+      level,
+      params,
+      raw,
+      timestamp: new Date(),
     });
+    renderLogs();
+    showStatusContainer();
+  }
 
-    resetButton.addEventListener('click', () => resetState());
+  function renderLogs() {
+    if (!refs.logOutput) return;
+    refs.logOutput.innerHTML = '';
+    state.logs.forEach((entry) => {
+      const item = document.createElement('div');
+      item.className = `mb-1 text-xs sm:text-sm ${logLevelClasses[entry.level] || logLevelClasses.default}`;
+      const time = entry.timestamp.toLocaleTimeString(i18next.language === 'zh' ? 'zh-CN' : 'en-US');
+      const message = entry.raw ? entry.raw : i18next.t(entry.key, entry.params || {});
+      item.textContent = `[${time}] ${message}`;
+      refs.logOutput.append(item);
+    });
+    refs.logOutput.scrollTop = refs.logOutput.scrollHeight;
+  }
 
-    function updateSelectionInfo(file) {
-        selectionInfo.classList.remove('alert-warning', 'alert-danger');
-        selectionInfo.classList.add('alert-info');
-        selectionInfo.textContent = `已选择文件：${file.name}（${formatBytes(file.size)}）`;
-        selectionInfo.style.display = 'block';
-        processButton.disabled = false;
-        resetButton.disabled = false;
-        appendLog('HTML 文件已准备好，可以开始处理。', 'success');
+  function updateResourceTable(assets) {
+    state.assets = Array.isArray(assets) ? assets : [];
+    renderResourceTable();
+  }
+
+  function renderResourceTable() {
+    if (!refs.resourceTableWrapper || !refs.resourceTableBody) return;
+    refs.resourceTableBody.innerHTML = '';
+    if (!state.assets.length) {
+      refs.resourceTableWrapper.classList.add('hidden');
+      return;
     }
 
-    async function processFile() {
-        if (!selectedFile) {
-            appendLog('请先选择需要处理的 HTML 文件。', 'warning');
-            return;
-        }
+    state.assets.forEach((asset) => {
+      const row = document.createElement('tr');
 
-        toggleProcessingState(true);
-        statusContainer.style.display = 'block';
-        appendLog('正在读取文件内容...', 'info');
+      const typeCell = document.createElement('td');
+      typeCell.className = 'px-4 py-3 align-top';
+      typeCell.textContent = asset.type || '-';
 
-        try {
-            const htmlSource = await selectedFile.text();
-            appendLog('正在解析并下载远程资源...', 'info');
-
-            const localizer = new BrowserHtmlAssetsLocalizer({
-                htmlContent: htmlSource,
-                htmlFileName: selectedFile.name || 'index.html',
-            });
-
-            const result = await localizer.process();
-            const { summary, zipBlob, zipFileName } = result;
-
-            appendLog(`检测到 ${summary.totalRemoteResources} 个远程资源，成功本地化 ${summary.localizedResources} 个。`, 'success');
-            updateResourceTable(summary.assets || []);
-
-            triggerDownload(zipBlob, zipFileName);
-            appendLog(`压缩包已生成：${zipFileName}`, 'success');
-
-            if (!summary.localizedResources) {
-                appendLog('未检测到需要本地化的远程资源，已将原始 HTML 写入压缩包。', 'warning');
-            }
-        } catch (error) {
-            const details = error instanceof Error ? error.message : String(error);
-            appendLog(`处理失败：${details}`, 'danger');
-        } finally {
-            toggleProcessingState(false);
-        }
-    }
-
-    function resetState() {
-        selectedFile = null;
-        fileInput.value = '';
-        selectionInfo.style.display = 'none';
-        logOutput.innerHTML = '';
-        statusContainer.style.display = 'none';
-        resourceTableBody.innerHTML = '';
-        resourceTableWrapper.style.display = 'none';
-        processButton.disabled = true;
-        resetButton.disabled = true;
-        processButton.innerHTML = '处理并下载压缩包';
-        fileInput.disabled = false;
-    }
-
-    function toggleProcessingState(isProcessing) {
-        fileInput.disabled = isProcessing;
-        processButton.disabled = isProcessing || !selectedFile;
-        resetButton.disabled = isProcessing;
-        if (isProcessing) {
-            processButton.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>处理中...';
-        } else {
-            processButton.innerHTML = '处理并下载压缩包';
-        }
-    }
-
-    function updateResourceTable(assets) {
-        if (!assets.length) {
-            resourceTableWrapper.style.display = 'none';
-            return;
-        }
-
-        resourceTableBody.innerHTML = '';
-        assets.forEach((asset) => {
-            const row = document.createElement('tr');
-
-            const typeCell = document.createElement('td');
-            typeCell.textContent = asset.type;
-            row.appendChild(typeCell);
-
-            const originalUrlCell = document.createElement('td');
-            originalUrlCell.classList.add('text-break');
-            const link = document.createElement('a');
-            link.href = asset.originalUrl;
-            link.target = '_blank';
-            link.rel = 'noopener noreferrer';
-            link.textContent = asset.originalUrl;
-            originalUrlCell.appendChild(link);
-            row.appendChild(originalUrlCell);
-
-            const localPathCell = document.createElement('td');
-            localPathCell.classList.add('text-break');
-            localPathCell.textContent = asset.localRelativePath;
-            row.appendChild(localPathCell);
-
-            const sizeCell = document.createElement('td');
-            sizeCell.classList.add('text-end');
-            sizeCell.textContent = formatBytes(asset.bytesWritten || 0);
-            row.appendChild(sizeCell);
-
-            resourceTableBody.appendChild(row);
-        });
-        resourceTableWrapper.style.display = 'block';
-    }
-
-    function appendLog(message, level = 'info') {
-        statusContainer.style.display = 'block';
-        const entry = document.createElement('div');
-        entry.className = `small mb-1 ${getLogClass(level)}`;
-        const timestamp = new Date().toLocaleTimeString();
-        entry.textContent = `[${timestamp}] ${message}`;
-        logOutput.appendChild(entry);
-        logOutput.scrollTop = logOutput.scrollHeight;
-    }
-
-    function getLogClass(level) {
-        switch (level) {
-            case 'success':
-                return 'text-success';
-            case 'warning':
-                return 'text-warning';
-            case 'danger':
-                return 'text-danger';
-            case 'info':
-                return 'text-info';
-            default:
-                return 'text-secondary';
-        }
-    }
-
-    function triggerDownload(blob, fileName) {
-        const url = URL.createObjectURL(blob);
+      const originalCell = document.createElement('td');
+      originalCell.className = 'px-4 py-3 align-top text-sky-200 hover:text-sky-100 break-words';
+      if (asset.originalUrl) {
         const link = document.createElement('a');
-        link.href = url;
-        link.download = fileName;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        setTimeout(() => URL.revokeObjectURL(url), 2000);
-    }
+        link.href = asset.originalUrl;
+        link.target = '_blank';
+        link.rel = 'noopener noreferrer';
+        link.className = 'break-words';
+        link.textContent = asset.originalUrl;
+        originalCell.append(link);
+      } else {
+        originalCell.textContent = '-';
+      }
 
-    function formatBytes(bytes) {
-        if (!bytes) {
-            return '0 B';
-        }
-        const units = ['B', 'KB', 'MB', 'GB'];
-        const exponent = Math.min(Math.floor(Math.log(bytes) / Math.log(1024)), units.length - 1);
-        const value = bytes / Math.pow(1024, exponent);
-        return `${value.toFixed(value >= 10 || exponent === 0 ? 0 : 1)} ${units[exponent]}`;
-    }
+      const localCell = document.createElement('td');
+      localCell.className = 'px-4 py-3 align-top text-slate-300 break-words';
+      localCell.textContent = asset.localRelativePath || '-';
+
+      const sizeCell = document.createElement('td');
+      sizeCell.className = 'px-4 py-3 text-right align-top text-slate-200';
+      sizeCell.textContent = formatBytes(asset.bytesWritten);
+
+      row.append(typeCell, originalCell, localCell, sizeCell);
+      refs.resourceTableBody.append(row);
+    });
+
+    refs.resourceTableWrapper.classList.remove('hidden');
+  }
+
+  function triggerDownload(blob, fileName) {
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = fileName;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    setTimeout(() => URL.revokeObjectURL(url), 2000);
+  }
+
+  function disableControls() {
+    refs.fileInput && (refs.fileInput.disabled = true);
+    refs.processButton && (refs.processButton.disabled = true);
+    refs.resetButton && (refs.resetButton.disabled = true);
+  }
+
+  function formatBytes(bytes) {
+    if (!bytes) return '0 B';
+    const units = ['B', 'KB', 'MB', 'GB'];
+    const exponent = Math.min(Math.floor(Math.log(bytes) / Math.log(1024)), units.length - 1);
+    const value = bytes / Math.pow(1024, exponent);
+    return `${value.toFixed(value >= 10 || exponent === 0 ? 0 : 1)} ${units[exponent]}`;
+  }
 })();
