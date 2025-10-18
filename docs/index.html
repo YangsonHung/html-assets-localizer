@@ -18,7 +18,7 @@
       <div class="col-lg-8 mx-auto text-center">
         <h1 class="display-4 fw-bold mb-4">HTML Assets Localizer</h1>
         <p class="lead mb-4">
-          一个强大的工具，用于将HTML文件中的外部资源（JavaScript、CSS等）本地化，支持Python和Node.js双版本
+          一个强大的工具，用于将HTML文件中的外部资源（JavaScript、CSS等）本地化，支持 Node.js CLI 与浏览器界面
         </p>
         <div class="d-flex justify-content-center gap-3">
           <a href="#installation" class="btn btn-light btn-lg">开始使用</a>
@@ -199,27 +199,13 @@
             <li class="nav-item" role="presentation">
               <button
                       class="nav-link active"
-                      id="python-tab"
-                      data-bs-toggle="tab"
-                      data-bs-target="#python"
-                      type="button"
-                      role="tab"
-                      aria-controls="python"
-                      aria-selected="true"
-              >
-                Python版本
-              </button>
-            </li>
-            <li class="nav-item" role="presentation">
-              <button
-                      class="nav-link"
                       id="nodejs-tab"
                       data-bs-toggle="tab"
                       data-bs-target="#nodejs"
                       type="button"
                       role="tab"
                       aria-controls="nodejs"
-                      aria-selected="false"
+                      aria-selected="true"
               >
                 Node.js版本
               </button>
@@ -228,28 +214,6 @@
           <div class="tab-content" id="myTabContent">
             <div
                     class="tab-pane fade show active"
-                    id="python"
-                    role="tabpanel"
-                    aria-labelledby="python-tab"
-            >
-              <h5 class="mt-3">安装要求</h5>
-              <ul>
-                <li>Python 3.6+</li>
-                <li>无需额外依赖，使用标准库</li>
-              </ul>
-              <h5 class="mt-4">使用方法</h5>
-              <div class="code-block">
-                    <pre>
-# 基本使用
-python assets_localizer.py input.html target_directory
-
-# 示例
-python assets_localizer.py index.html myProject</pre
-                    >
-              </div>
-            </div>
-            <div
-                    class="tab-pane fade"
                     id="nodejs"
                     role="tabpanel"
                     aria-labelledby="nodejs-tab"
@@ -301,7 +265,7 @@ node assets_localizer.js index.html myProject</pre
 
           <h5 class="mt-4">运行工具</h5>
           <div class="code-block">
-            <pre>python assets_localizer.py example.html myProject</pre>
+            <pre>npx html-assets-localizer example.html ./output</pre>
           </div>
 
           <h5 class="mt-4">输出结构</h5>
@@ -333,27 +297,13 @@ node assets_localizer.js index.html myProject</pre
             <li class="nav-item" role="presentation">
               <button
                       class="nav-link active"
-                      id="python-module-tab"
-                      data-bs-toggle="tab"
-                      data-bs-target="#python-module"
-                      type="button"
-                      role="tab"
-                      aria-controls="python-module"
-                      aria-selected="true"
-              >
-                Python
-              </button>
-            </li>
-            <li class="nav-item" role="presentation">
-              <button
-                      class="nav-link"
                       id="nodejs-module-tab"
                       data-bs-toggle="tab"
                       data-bs-target="#nodejs-module"
                       type="button"
                       role="tab"
                       aria-controls="nodejs-module"
-                      aria-selected="false"
+                      aria-selected="true"
               >
                 Node.js
               </button>
@@ -362,24 +312,6 @@ node assets_localizer.js index.html myProject</pre
           <div class="tab-content" id="moduleTabContent">
             <div
                     class="tab-pane fade show active"
-                    id="python-module"
-                    role="tabpanel"
-                    aria-labelledby="python-module-tab"
-            >
-              <div class="code-block mt-3">
-                    <pre>
-from assets_localizer import HTMLScriptLocalizer
-
-# 创建实例
-localizer = HTMLScriptLocalizer("input.html", "target_directory")
-
-# 处理文件
-localizer.process()</pre
-                    >
-              </div>
-            </div>
-            <div
-                    class="tab-pane fade"
                     id="nodejs-module"
                     role="tabpanel"
                     aria-labelledby="nodejs-module-tab"
