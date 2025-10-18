@@ -282,11 +282,33 @@ node dist/cli.js test.html output
 
 ```text
 html-assets-localizer/
-├── src/              # TypeScript source code
-├── dist/             # Compiled output
-├── docs/             # UI interface files
-├── package.json      # Project configuration
-└── tsconfig.json     # TypeScript configuration
+├── src/                      # TypeScript source
+│   ├── cli.ts                # CLI entry point
+│   ├── index.ts              # Package exports
+│   ├── localizer.ts          # Core localization pipeline
+│   ├── types.ts              # Shared type declarations
+│   ├── browser/              # Browser bundle entry (UMD)
+│   │   ├── index.ts
+│   │   └── localizer.ts
+│   └── server/
+│       └── uiServer.ts       # Express-powered UI launcher
+├── tests/
+│   └── localizer.test.ts     # Vitest coverage for HTML flows
+├── docs/                     # UI documentation and static assets
+├── archive/                  # Archived examples and legacy assets
+├── example.html              # Ready-to-run sample HTML file
+├── .github/                  # GitHub workflows and issue templates
+├── AGENTS.md                 # Contributor quick-start guide
+├── CHANGELOG.md              # Release notes
+├── CONTRIBUTING.md           # Detailed contribution process
+├── package.json          # Project metadata and scripts
+├── pnpm-lock.yaml         # Locked dependency graph
+├── tsconfig.json          # TypeScript compiler options
+├── vite.config.ts         # CLI build configuration
+├── vite.browser.config.ts # Browser bundle configuration
+├── vitest.config.ts       # Vitest runner setup
+├── README.md / README.zh.md # Documentation (English & Chinese)
+└── dist/ (generated)      # Build output produced by `pnpm run build`
 ```
 
 ---

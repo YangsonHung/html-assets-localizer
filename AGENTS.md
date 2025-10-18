@@ -1,19 +1,29 @@
 # Repository Guidelines
 
 ## Project Structure & Module Organization
-Source code lives in `src/`, with the CLI entry at `src/cli.ts`, core logic in `src/localizer.ts`, and the Express UI launcher under `src/server/uiServer.ts`. Type definitions are collected in `src/types.ts`, while compiled JavaScript is emitted to `dist/` after building (keep this folder out of version control). Example assets and documentation reside in `example.html` and `docs/`. Tests are co-located under `tests/`, currently focusing on the HTML localization flow.
+
+Source lives in `src/`, with the CLI entry point at `src/cli.ts`, the localization pipeline in `src/localizer.ts`, and the optional UI server in `src/server/uiServer.ts`. Shared types stay in `src/types.ts`. Build artifacts land inside the git-ignored `dist/` directory after `pnpm run build`. Documentation and sample markup reside in `docs/` and `example.html`, while automated checks live under `tests/`.
 
 ## Build, Test, and Development Commands
-Use `pnpm install` to set up dependencies. Run `pnpm run build` to compile TypeScript output, and `pnpm run dev` for rapid CLI prototyping via `ts-node`. Execute `pnpm test` (or `pnpm test:watch`) to run Vitest suites. The release helper `pnpm run release` rebuilds before publishing, while `pnpm run clean` removes previous builds.
+
+- `pnpm install`: restore dependencies after cloning or receiving an updated lockfile.
+- `pnpm run dev`: execute the CLI through `ts-node` for quick iteration and debugging.
+- `pnpm run build`: compile TypeScript to CommonJS output in `dist/`; required before releases.
+- `pnpm test` / `pnpm test:watch`: run Vitest once or in watch mode to validate localization flows.
+- `pnpm run clean`: remove stale build output; pair with `pnpm run release` when preparing packages.
 
 ## Coding Style & Naming Conventions
-Adopt TypeScript strict mode with ES2020 targets and CommonJS modules. Prefer camelCase for variables/functions and PascalCase for exported classes/interfaces. Keep public APIs documented via concise JSDoc when behavior is non-obvious. Maintain LF line endings and ASCII characters unless a file already requires Unicode (e.g., README emojis).
+
+The codebase targets TypeScript strict mode with ES2020 syntax. Use camelCase for variables and functions, PascalCase for exported types or classes, and kebab-case for CLI flags. Maintain LF line endings and ASCII text unless a file already contains Unicode. Document externally visible behaviors with concise JSDoc and prefer descriptive names over excessive comments.
 
 ## Testing Guidelines
-Vitest is the primary framework. Place new suites in `tests/` using the `*.test.ts` suffix (e.g., `tests/localizer.test.ts`). Mock remote resources via lightweight HTTP servers to avoid network dependencies. Run `pnpm test` locally before submitting PRs; add coverage checks if new modules handle critical logic. Capture regression scenarios—especially around HTML parsing, resource deduplication, and error handling.
+
+Vitest provides the test harness. Create suites alongside source in `tests/` using the `*.test.ts` suffix (for example, `tests/localizer.test.ts`). Stub network calls with local fixtures or lightweight HTTP servers so runs are deterministic. Execute `pnpm test` before pushing, and add regression coverage whenever HTML parsing, asset deduplication, or localized output formatting changes.
 
 ## Commit & Pull Request Guidelines
-Follow the existing `<type>: <description>` convention (e.g., `feat: add ui mode alias`) and keep messages in English. A PR should link relevant issues, summarise key changes, list verification steps (`pnpm run build`, `pnpm test`, CLI/UI demos), and include screenshots or logs when UI behavior changes. Ensure branches are rebased on the latest `main` and avoid bundling unrelated refactors.
+
+Commits follow `<type>: <description>` (e.g., `fix: guard empty asset list`) and should stay scoped to a single concern. Pull requests must reference related issues, summarise functional changes, and list verification steps such as `pnpm run build`, `pnpm test`, or CLI/UI demos. Include screenshots or logs when adjusting UI behavior, and avoid bundling refactors with features.
 
 ## Security & Configuration Tips
-Never commit downloaded assets or temporary outputs; add new ignore patterns to `.gitignore` when necessary. The CLI downloads external resources—mention trusted domains or licensing constraints in PRs if new defaults are introduced. When exposing the UI (`--host 0.0.0.0`), confirm firewall rules and redact sensitive URLs from logs before sharing.
+
+Never commit downloaded binaries, generated translations, or screenshots; extend `.gitignore` if new artifacts appear. Note trusted domains and licensing in PRs when introducing external resources. When launching the UI with `--host 0.0.0.0`, verify firewall rules and redact internal URLs from shared logs to prevent leaking sensitive endpoints.

@@ -281,11 +281,33 @@ node dist/cli.js test.html output
 
 ```text
 html-assets-localizer/
-├── src/              # TypeScript 源码
-├── dist/             # 编译输出
-├── docs/             # UI 界面文件
-├── package.json      # 项目配置
-└── tsconfig.json     # TypeScript 配置
+├── src/                      # TypeScript 源码
+│   ├── cli.ts                # CLI 入口
+│   ├── index.ts              # 包导出入口
+│   ├── localizer.ts          # 核心本地化流程
+│   ├── types.ts              # 共享类型定义
+│   ├── browser/              # 浏览器端 UMD 入口
+│   │   ├── index.ts
+│   │   └── localizer.ts
+│   └── server/
+│       └── uiServer.ts       # 基于 Express 的可视化界面服务
+├── tests/
+│   └── localizer.test.ts     # Vitest 测试用例
+├── docs/                     # UI 文档与静态资源
+├── archive/                  # 历史示例与备份资源
+├── example.html              # 示例 HTML 文件
+├── .github/                  # GitHub Workflow 与模版
+├── AGENTS.md                 # 贡献者入门指南
+├── CHANGELOG.md              # 版本更新记录
+├── CONTRIBUTING.md           # 贡献流程说明
+├── package.json              # 项目元数据与脚本
+├── pnpm-lock.yaml            # 依赖锁定文件
+├── tsconfig.json             # TypeScript 编译配置
+├── vite.config.ts            # CLI 构建配置
+├── vite.browser.config.ts    # 浏览器构建配置
+├── vitest.config.ts          # Vitest 配置
+├── README.md / README.zh.md  # 英文与中文文档
+└── dist/ (构建产物)          # `pnpm run build` 生成的输出
 ```
 
 ---
