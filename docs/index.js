@@ -15,19 +15,22 @@
     const library = window.HtmlAssetsLocalizer;
     if (!library || !library.BrowserHtmlAssetsLocalizer) {
         if (statusContainer) {
-            statusContainer.classList.remove('hidden');
+            statusContainer.style.display = 'block';
         }
         if (logOutput) {
             const entry = document.createElement('div');
-            entry.className = 'text-sm text-rose-600 dark:text-rose-300';
+            entry.className = 'small text-danger';
             entry.textContent = '未能加载本地化核心脚本，请检查网络或稍后重试。';
             logOutput.appendChild(entry);
         }
-
         console.error('BrowserHtmlAssetsLocalizer is not available on window.HtmlAssetsLocalizer.');
         fileInput.disabled = true;
-        setButtonDisabled(processButton, true);
-        setButtonDisabled(resetButton, true);
+        if (processButton) {
+            processButton.disabled = true;
+        }
+        if (resetButton) {
+            resetButton.disabled = true;
+        }
         return;
     }
 
@@ -51,36 +54,13 @@
 
     resetButton.addEventListener('click', () => resetState());
 
-    function setButtonDisabled(button, isDisabled) {
-        if (!button) {
-            return;
-        }
-        button.disabled = isDisabled;
-        if (isDisabled) {
-            button.setAttribute('disabled', '');
-            button.setAttribute('aria-disabled', 'true');
-            button.classList.add('cursor-not-allowed');
-            button.classList.remove('cursor-pointer');
-        } else {
-            button.removeAttribute('disabled');
-            button.removeAttribute('aria-disabled');
-            button.classList.add('cursor-pointer');
-            button.classList.remove('cursor-not-allowed');
-        }
-    }
-
-    setButtonDisabled(processButton, true);
-    setButtonDisabled(resetButton, true);
-
     function updateSelectionInfo(file) {
-        selectionInfo.className =
-            'rounded-2xl border border-blue-300/60 bg-blue-50 px-4 py-3 text-sm text-blue-700 dark:border-blue-400/40 dark:bg-blue-500/15 dark:text-blue-100';
+        selectionInfo.classList.remove('alert-warning', 'alert-danger');
+        selectionInfo.classList.add('alert-info');
         selectionInfo.textContent = `已选择文件：${file.name}（${formatBytes(file.size)}）`;
-        selectionInfo.classList.remove('hidden');
-
-        setButtonDisabled(processButton, false);
-        setButtonDisabled(resetButton, false);
-
+        selectionInfo.style.display = 'block';
+        processButton.disabled = false;
+        resetButton.disabled = false;
         appendLog('HTML 文件已准备好，可以开始处理。', 'success');
     }
 
@@ -91,7 +71,7 @@
         }
 
         toggleProcessingState(true);
-        statusContainer.classList.remove('hidden');
+        statusContainer.style.display = 'block';
         appendLog('正在读取文件内容...', 'info');
 
         try {
@@ -106,10 +86,7 @@
             const result = await localizer.process();
             const { summary, zipBlob, zipFileName } = result;
 
-            appendLog(
-                `检测到 ${summary.totalRemoteResources} 个远程资源，成功本地化 ${summary.localizedResources} 个。`,
-                'success'
-            );
+            appendLog(`检测到 ${summary.totalRemoteResources} 个远程资源，成功本地化 ${summary.localizedResources} 个。`, 'success');
             updateResourceTable(summary.assets || []);
 
             triggerDownload(zipBlob, zipFileName);
@@ -129,29 +106,23 @@
     function resetState() {
         selectedFile = null;
         fileInput.value = '';
-        selectionInfo.classList.add('hidden');
+        selectionInfo.style.display = 'none';
         logOutput.innerHTML = '';
-        statusContainer.classList.add('hidden');
+        statusContainer.style.display = 'none';
         resourceTableBody.innerHTML = '';
-        resourceTableWrapper.classList.add('hidden');
-        setButtonDisabled(processButton, true);
-        setButtonDisabled(resetButton, true);
+        resourceTableWrapper.style.display = 'none';
+        processButton.disabled = true;
+        resetButton.disabled = true;
         processButton.innerHTML = '处理并下载压缩包';
         fileInput.disabled = false;
     }
 
     function toggleProcessingState(isProcessing) {
         fileInput.disabled = isProcessing;
-        setButtonDisabled(processButton, isProcessing || !selectedFile);
-        setButtonDisabled(resetButton, isProcessing);
-
+        processButton.disabled = isProcessing || !selectedFile;
+        resetButton.disabled = isProcessing;
         if (isProcessing) {
-            processButton.innerHTML =
-                '<span class="flex items-center justify-center gap-2">' +
-                '<svg class="h-4 w-4 animate-spin text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">' +
-                '<circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>' +
-                '<path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>' +
-                '</svg>处理中...</span>';
+            processButton.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>处理中...';
         } else {
             processButton.innerHTML = '处理并下载压缩包';
         }
@@ -159,53 +130,47 @@
 
     function updateResourceTable(assets) {
         if (!assets.length) {
-            resourceTableWrapper.classList.add('hidden');
-            resourceTableBody.innerHTML = '';
+            resourceTableWrapper.style.display = 'none';
             return;
         }
 
         resourceTableBody.innerHTML = '';
         assets.forEach((asset) => {
             const row = document.createElement('tr');
-            row.className = 'transition hover:bg-slate-100 dark:hover:bg-slate-800/40';
 
             const typeCell = document.createElement('td');
-            typeCell.className = 'px-4 py-3 align-top text-xs font-semibold uppercase tracking-wide text-slate-600 dark:text-slate-300';
             typeCell.textContent = asset.type;
             row.appendChild(typeCell);
 
             const originalUrlCell = document.createElement('td');
-            originalUrlCell.classList.add('px-4', 'py-3', 'break-all', 'text-slate-700', 'dark:text-slate-200');
+            originalUrlCell.classList.add('text-break');
             const link = document.createElement('a');
             link.href = asset.originalUrl;
             link.target = '_blank';
             link.rel = 'noopener noreferrer';
-            link.className =
-                'text-indigo-600 underline decoration-indigo-400/60 underline-offset-4 transition hover:text-indigo-500 dark:text-indigo-200 dark:decoration-indigo-400/40 dark:hover:text-indigo-100 dark:hover:decoration-indigo-200';
-            link.textContent = asset.originalUrl || '';
+            link.textContent = asset.originalUrl;
             originalUrlCell.appendChild(link);
             row.appendChild(originalUrlCell);
 
             const localPathCell = document.createElement('td');
-            localPathCell.classList.add('px-4', 'py-3', 'break-all', 'text-slate-600', 'dark:text-slate-300');
+            localPathCell.classList.add('text-break');
             localPathCell.textContent = asset.localRelativePath;
             row.appendChild(localPathCell);
 
             const sizeCell = document.createElement('td');
-            sizeCell.classList.add('px-4', 'py-3', 'text-right', 'text-slate-500', 'dark:text-slate-400');
+            sizeCell.classList.add('text-end');
             sizeCell.textContent = formatBytes(asset.bytesWritten || 0);
             row.appendChild(sizeCell);
 
             resourceTableBody.appendChild(row);
         });
-
-        resourceTableWrapper.classList.remove('hidden');
+        resourceTableWrapper.style.display = 'block';
     }
 
     function appendLog(message, level = 'info') {
-        statusContainer.classList.remove('hidden');
+        statusContainer.style.display = 'block';
         const entry = document.createElement('div');
-        entry.className = `mb-1 text-xs leading-6 ${getLogClass(level)}`;
+        entry.className = `small mb-1 ${getLogClass(level)}`;
         const timestamp = new Date().toLocaleTimeString();
         entry.textContent = `[${timestamp}] ${message}`;
         logOutput.appendChild(entry);
@@ -215,15 +180,15 @@
     function getLogClass(level) {
         switch (level) {
             case 'success':
-                return 'text-emerald-600 dark:text-emerald-300';
+                return 'text-success';
             case 'warning':
-                return 'text-amber-500 dark:text-amber-300';
+                return 'text-warning';
             case 'danger':
-                return 'text-rose-500 dark:text-rose-300';
+                return 'text-danger';
             case 'info':
-                return 'text-indigo-600 dark:text-indigo-200';
+                return 'text-info';
             default:
-                return 'text-slate-500 dark:text-slate-400';
+                return 'text-secondary';
         }
     }
 
@@ -248,4 +213,3 @@
         return `${value.toFixed(value >= 10 || exponent === 0 ? 0 : 1)} ${units[exponent]}`;
     }
 })();
-
