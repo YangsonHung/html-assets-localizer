@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## 1.2.1 - 2025-10-18
+
+- update docs/index.html
+
 ## 1.2.0 - 2025-10-17
 
 - add browser-friendly UMD bundle backed by `BrowserHtmlAssetsLocalizer`, allowing docs site and GH Pages to run localization fully in browser.
