@@ -4,251 +4,268 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>HTML Assets Localizer - 资源本地化工具</title>
-  <link
-          href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
-          rel="stylesheet"
-  />
+  <script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'Segoe UI', 'Tahoma', 'Geneva', 'Verdana', 'sans-serif'],
+            mono: ['JetBrains Mono', 'Fira Code', 'SFMono-Regular', 'Menlo', 'monospace'],
+          },
+          colors: {
+            brand: {
+              50: '#eef2ff',
+              100: '#e0e7ff',
+              200: '#c7d2fe',
+              300: '#a5b4fc',
+              400: '#818cf8',
+              500: '#6366f1',
+              600: '#4f46e5',
+              700: '#4338ca',
+              800: '#3730a3',
+              900: '#312e81',
+              950: '#1e1b4b',
+            },
+          },
+          boxShadow: {
+            'brand-glow': '0 25px 50px -12px rgba(67, 56, 202, 0.35)',
+          },
+        },
+      },
+    };
+  </script>
   <link href="./index.css" rel="stylesheet" />
 </head>
+<body class="min-h-screen bg-slate-950 text-slate-100 antialiased">
+<div class="relative isolate">
+  <div aria-hidden="true" class="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
+    <div class="absolute left-1/2 top-[-12rem] h-[32rem] w-[48rem] -translate-x-1/2 rounded-full bg-brand-500/20 blur-3xl"></div>
+    <div class="absolute right-[-18rem] bottom-[-16rem] h-[28rem] w-[44rem] rounded-full bg-pink-500/20 blur-3xl"></div>
+    <div class="absolute left-[-12rem] bottom-[-10rem] h-[22rem] w-[30rem] rounded-full bg-sky-500/10 blur-3xl"></div>
+  </div>
 
-<body>
-<div class="hero-section">
-  <div class="container">
-    <div class="row">
-      <div class="col-lg-8 mx-auto text-center">
-        <h1 class="display-4 fw-bold mb-4">HTML Assets Localizer</h1>
-        <p class="lead mb-4">
-          一个强大的工具，用于将HTML文件中的外部资源（JavaScript、CSS等）本地化，支持 Node.js CLI 与浏览器界面
+  <header class="px-6 pt-20 pb-24 text-center sm:px-8">
+    <div class="mx-auto max-w-5xl">
+      <span class="inline-flex items-center rounded-full border border-white/20 bg-white/10 px-4 py-1 text-sm font-medium text-slate-100">
+        CLI 与浏览器双模式 · 零配置上手
+      </span>
+      <h1 class="mt-6 text-4xl font-bold tracking-tight text-white sm:text-5xl">
+        HTML Assets Localizer
+      </h1>
+      <p class="mx-auto mt-6 max-w-3xl text-lg leading-relaxed text-slate-300">
+        一个强大的工具，用于将 HTML 文件中的外部资源（JavaScript、CSS 等）本地化，
+        同时支持 Node.js 命令行与浏览器界面，帮助你快速构建可靠的离线部署方案。
+      </p>
+      <div class="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
+        <a
+          href="#installation"
+          class="inline-flex items-center justify-center rounded-full bg-white px-8 py-3 text-base font-semibold text-slate-950 shadow-brand-glow transition hover:bg-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+        >
+          开始使用
+        </a>
+        <a
+          href="https://github.com/YangsonHung/html-assets-localizer"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="inline-flex items-center justify-center rounded-full border border-white/30 px-8 py-3 text-base font-semibold text-white transition hover:border-white hover:bg-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/60"
+        >
+          查看源码
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <main class="mx-auto max-w-6xl px-6 pb-24 sm:px-8">
+    <section id="online-tool" class="py-16">
+      <div class="text-center">
+        <h2 class="text-3xl font-semibold text-white sm:text-4xl">在线体验 - 本地化您的 HTML</h2>
+        <p class="mx-auto mt-4 max-w-2xl text-base leading-relaxed text-slate-300">
+          上传包含外部资源的 HTML 文件，工具会自动下载远程 CSS/JS 资源、更新引用路径，并生成压缩包供下载，实现一键离线化。
         </p>
-        <div class="d-flex justify-content-center gap-3">
-          <a href="#installation" class="btn btn-light btn-lg">开始使用</a>
-          <a
-                  href="https://github.com/YangsonHung/html-assets-localizer"
-                  class="btn btn-outline-light btn-lg"
-          >查看源码</a
-          >
-        </div>
       </div>
-    </div>
-  </div>
-</div>
 
-<div class="container mb-5">
-  <div class="row mb-5" id="online-tool">
-    <div class="col-lg-12">
-      <h2 class="text-center mb-4">在线体验 - 本地化您的 HTML</h2>
-      <div class="card shadow-sm">
-        <div class="card-body">
-          <p class="text-muted">
-            上传包含外部资源的 HTML 文件，工具会自动下载远程 CSS/JS
-            资源并替换为本地引用，最终生成完整的压缩包供下载。
-          </p>
-          <div class="row g-3 align-items-end">
-            <div class="col-md-6">
-              <label for="htmlFileInput" class="form-label"
-              >选择 HTML 文件</label
-              >
-              <input
-                      type="file"
-                      accept=".html,.htm,text/html"
-                      class="form-control"
-                      id="htmlFileInput"
-              />
-              <div class="form-text">
-                目前支持引用外部 <code>http(s)</code> 资源的 HTML 文件。
-              </div>
-            </div>
-            <div class="col-md-6 text-md-end">
-              <button class="btn btn-primary" id="processButton" disabled>
-                处理并下载压缩包
-              </button>
-              <button
-                      class="btn btn-outline-secondary ms-2"
-                      id="resetButton"
-                      disabled
-              >
-                重置
-              </button>
-            </div>
+      <div class="mt-12 rounded-3xl border border-white/10 bg-slate-900/70 p-8 shadow-2xl shadow-black/40 backdrop-blur-xl sm:p-10">
+        <p class="text-left text-base text-slate-300">
+          支持自动解析 HTML 中的 <code class="rounded bg-slate-800/70 px-2 py-1 text-sm text-slate-100">script</code>、
+          <code class="rounded bg-slate-800/70 px-2 py-1 text-sm text-slate-100">link</code> 和
+          <code class="rounded bg-slate-800/70 px-2 py-1 text-sm text-slate-100">img</code> 标签，并处理绝大多数常见的 CDN 资源。
+        </p>
+
+        <div class="mt-10 grid gap-10 lg:grid-cols-2 lg:items-end">
+          <div>
+            <label for="htmlFileInput" class="text-sm font-semibold uppercase tracking-wide text-slate-300">
+              选择 HTML 文件
+            </label>
+            <input
+              type="file"
+              accept=".html,.htm,text/html"
+              id="htmlFileInput"
+              class="mt-4 block w-full rounded-2xl border border-white/10 bg-slate-950/70 px-4 py-3 text-sm text-slate-100 ring-offset-slate-900 transition focus:border-brand-400 focus:outline-none focus:ring-2 focus:ring-brand-400/60 focus:ring-offset-2"
+            />
+            <p class="mt-3 text-sm text-slate-400">
+              目前支持引用外部 <code class="rounded bg-slate-800/70 px-2 py-1 text-xs text-slate-200">http(s)</code> 资源的 HTML 文件。
+            </p>
           </div>
-          <div
-                  class="alert alert-info mt-3 mb-0"
-                  id="selectionInfo"
-                  role="alert"
-                  style="display: none"
-          ></div>
-          <div class="mt-4" id="statusContainer" style="display: none">
-            <h5 class="mb-3">处理日志</h5>
-            <div class="log-output" id="logOutput"></div>
-            <div
-                    class="mt-4"
-                    id="resourceTableWrapper"
-                    style="display: none"
+
+          <div class="flex flex-col gap-4 sm:flex-row sm:justify-end">
+            <button
+              id="processButton"
+              disabled
+              class="inline-flex items-center justify-center rounded-2xl bg-brand-500 px-6 py-3 text-base font-semibold text-white shadow-brand-glow transition hover:bg-brand-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-300 disabled:cursor-not-allowed disabled:opacity-60"
             >
-              <h5 class="mb-3">已本地化资源</h5>
-              <div class="table-responsive">
-                <table
-                        class="table table-sm align-middle mb-0"
-                        id="resourceTable"
-                >
-                  <thead class="table-light">
-                  <tr>
-                    <th scope="col">类型</th>
-                    <th scope="col">原始链接</th>
-                    <th scope="col">本地路径</th>
-                    <th scope="col" class="text-end">大小</th>
-                  </tr>
-                  </thead>
-                  <tbody></tbody>
-                </table>
-              </div>
+              处理并下载压缩包
+            </button>
+            <button
+              id="resetButton"
+              disabled
+              class="inline-flex items-center justify-center rounded-2xl border border-white/20 px-6 py-3 text-base font-semibold text-slate-200 transition hover:border-white/40 hover:bg-white/10 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/50 disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              重置
+            </button>
+          </div>
+        </div>
+
+        <div
+          id="selectionInfo"
+          class="alert alert-info mt-8 text-sm leading-relaxed"
+          role="alert"
+          style="display: none"
+        ></div>
+
+        <div id="statusContainer" class="mt-12 space-y-8" style="display: none">
+          <div>
+            <h3 class="text-2xl font-semibold text-white">处理日志</h3>
+            <div id="logOutput" class="log-output mt-4"></div>
+          </div>
+          <div id="resourceTableWrapper" style="display: none">
+            <h3 class="text-2xl font-semibold text-white">已本地化资源</h3>
+            <div class="mt-4 overflow-hidden rounded-2xl border border-white/10 bg-slate-950/60">
+              <table id="resourceTable" class="min-w-full divide-y divide-white/10 text-left text-sm text-slate-200">
+                <thead class="bg-white/5 text-xs font-semibold uppercase tracking-wide text-slate-300">
+                <tr>
+                  <th scope="col" class="px-4 py-3">类型</th>
+                  <th scope="col" class="px-4 py-3">原始链接</th>
+                  <th scope="col" class="px-4 py-3">本地路径</th>
+                  <th scope="col" class="px-4 py-3 text-end">大小</th>
+                </tr>
+                </thead>
+                <tbody class="divide-y divide-white/5"></tbody>
+              </table>
             </div>
           </div>
         </div>
       </div>
-    </div>
-  </div>
+    </section>
 
-  <div class="row mb-5">
-    <div class="col-lg-12">
-      <h2 class="text-center mb-4">功能特性</h2>
-    </div>
-    <div class="col-md-4 mb-4">
-      <div class="card feature-card h-100 shadow-sm">
-        <div class="card-body text-center">
-          <div class="mb-3">
-            <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="48"
-                    height="48"
-                    fill="currentColor"
-                    class="bi bi-search text-primary"
-                    viewBox="0 0 16 16"
-            >
-              <path
-                      d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"
-              />
+    <section class="border-t border-white/10 py-16">
+      <div class="text-center">
+        <h2 class="text-3xl font-semibold text-white sm:text-4xl">功能特性</h2>
+        <p class="mx-auto mt-4 max-w-2xl text-base leading-relaxed text-slate-300">
+          满足离线部署、合规审查与本地调试等多种场景需求，让前端资源管理更安全、更可控。
+        </p>
+      </div>
+      <div class="mt-12 grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+        <div class="group rounded-3xl border border-white/10 bg-white/5 p-8 shadow-lg shadow-black/30 transition hover:border-brand-300/60 hover:bg-brand-400/10">
+          <div class="flex h-12 w-12 items-center justify-center rounded-2xl bg-brand-500/20 text-brand-200 transition group-hover:text-brand-100">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="currentColor" viewBox="0 0 16 16">
+              <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z" />
             </svg>
           </div>
-          <h4 class="card-title">自动检测</h4>
-          <p class="card-text">
-            自动检测HTML文件中的外部JavaScript和CSS资源
+          <h3 class="mt-6 text-xl font-semibold text-white">自动检测</h3>
+          <p class="mt-3 text-sm leading-relaxed text-slate-300">
+            智能识别 HTML 中的外部 JavaScript 和 CSS 资源，包含动态插入的常见 CDN 资源。
           </p>
         </div>
-      </div>
-    </div>
-    <div class="col-md-4 mb-4">
-      <div class="card feature-card h-100 shadow-sm">
-        <div class="card-body text-center">
-          <div class="mb-3">
-            <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="48"
-                    height="48"
-                    fill="currentColor"
-                    class="bi bi-download text-success"
-                    viewBox="0 0 16 16"
-            >
-              <path
-                      d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"
-              />
-              <path
-                      d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"
-              />
-            </svg>
-          </div>
-          <h4 class="card-title">批量下载</h4>
-          <p class="card-text">批量下载外部资源到本地目录</p>
-        </div>
-      </div>
-    </div>
-    <div class="col-md-4 mb-4">
-      <div class="card feature-card h-100 shadow-sm">
-        <div class="card-body text-center">
-          <div class="mb-3">
-            <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="48"
-                    height="48"
-                    fill="currentColor"
-                    class="bi bi-arrow-repeat text-info"
-                    viewBox="0 0 16 16"
-            >
-              <path
-                      d="M11.534 7h3.932a.25.25 0 0 1 .192.41l-1.966 2.36a.25.25 0 0 1-.384 0l-1.966-2.36a.25.25 0 0 1 .192-.41zm-11 2h3.932a.25.25 0 0 0 .192-.41L2.692 6.23a.25.25 0 0 0-.384 0L.342 8.59A.25.25 0 0 0 .534 9z"
-              />
-              <path
-                      fill-rule="evenodd"
-                      d="M8 3c-1.552 0-2.94.707-3.857 1.818a.5.5 0 1 1-.771-.636A6.002 6.002 0 0 1 13.917 7H12.9A5.002 5.002 0 0 0 8 3zM3.1 9a5.002 5.002 0 0 0 8.757 2.182.5.5 0 1 1 .771.636A6.002 6.002 0 0 1 2.083 9H3.1z"
-              />
-            </svg>
-          </div>
-          <h4 class="card-title">自动更新</h4>
-          <p class="card-text">自动更新HTML文件中的资源引用路径</p>
-        </div>
-      </div>
-    </div>
-  </div>
 
-  <div class="row mb-5" id="installation">
-    <div class="col-lg-12">
-      <h2 class="text-center mb-4">安装与使用</h2>
-      <div class="card shadow-sm">
-        <div class="card-body">
-          <ul class="nav nav-tabs" id="myTab" role="tablist">
-            <li class="nav-item" role="presentation">
-              <button
-                      class="nav-link active"
-                      id="nodejs-tab"
-                      data-bs-toggle="tab"
-                      data-bs-target="#nodejs"
-                      type="button"
-                      role="tab"
-                      aria-controls="nodejs"
-                      aria-selected="true"
-              >
-                Node.js版本
-              </button>
-            </li>
-          </ul>
-          <div class="tab-content" id="myTabContent">
-            <div
-                    class="tab-pane fade show active"
-                    id="nodejs"
-                    role="tabpanel"
-                    aria-labelledby="nodejs-tab"
-            >
-              <h5 class="mt-3">安装要求</h5>
-              <ul>
-                <li>Node.js 12+</li>
-                <li>无需额外依赖，使用内置模块</li>
-              </ul>
-              <h5 class="mt-4">使用方法</h5>
-              <div class="code-block">
-                    <pre>
-# 基本使用
+        <div class="group rounded-3xl border border-white/10 bg-white/5 p-8 shadow-lg shadow-black/30 transition hover:border-emerald-300/60 hover:bg-emerald-400/10">
+          <div class="flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-500/20 text-emerald-200 transition group-hover:text-emerald-100">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="currentColor" viewBox="0 0 16 16">
+              <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z" />
+              <path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z" />
+            </svg>
+          </div>
+          <h3 class="mt-6 text-xl font-semibold text-white">批量下载</h3>
+          <p class="mt-3 text-sm leading-relaxed text-slate-300">
+            一次性拉取远程资源，保持原始目录结构，确保依赖完备可追溯。
+          </p>
+        </div>
+
+        <div class="group rounded-3xl border border-white/10 bg-white/5 p-8 shadow-lg shadow-black/30 transition hover:border-sky-300/60 hover:bg-sky-400/10">
+          <div class="flex h-12 w-12 items-center justify-center rounded-2xl bg-sky-500/20 text-sky-200 transition group-hover:text-sky-100">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="currentColor" viewBox="0 0 16 16">
+              <path d="M11.534 7h3.932a.25.25 0 0 1 .192.41l-1.966 2.36a.25.25 0 0 1-.384 0l-1.966-2.36a.25.25 0 0 1 .192-.41zm-11 2h3.932a.25.25 0 0 0 .192-.41L2.692 6.23a.25.25 0 0 0-.384 0L.342 8.59A.25.25 0 0 0 .534 9z" />
+              <path fill-rule="evenodd" d="M8 3c-1.552 0-2.94.707-3.857 1.818a.5.5 0 1 1-.771-.636A6.002 6.002 0 0 1 13.917 7H12.9A5.002 5.002 0 0 0 8 3zM3.1 9a5.002 5.002 0 0 0 8.757 2.182.5.5 0 1 1 .771.636A6.002 6.002 0 0 1 2.083 9H3.1z" />
+            </svg>
+          </div>
+          <h3 class="mt-6 text-xl font-semibold text-white">自动更新</h3>
+          <p class="mt-3 text-sm leading-relaxed text-slate-300">
+            自动替换 HTML 中的资源引用路径，并给出详细的处理日志与结果汇总。
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section id="installation" class="border-t border-white/10 py-16">
+      <div class="grid gap-12 lg:grid-cols-[1.1fr,0.9fr]">
+        <div>
+          <h2 class="text-3xl font-semibold text-white sm:text-4xl">安装与使用</h2>
+          <p class="mt-4 text-base leading-relaxed text-slate-300">
+            使用 Node.js 版本可完成大型项目批量迁移，浏览器版本则适合快速预览或小型页面处理。
+          </p>
+          <div class="mt-8 rounded-3xl border border-white/10 bg-white/5 p-8 shadow-lg shadow-black/30">
+            <div class="inline-flex items-center rounded-full bg-brand-500/20 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-brand-100">
+              Node.js 版本
+            </div>
+            <h3 class="mt-4 text-xl font-semibold text-white">安装要求</h3>
+            <ul class="mt-3 list-disc space-y-2 pl-6 text-sm text-slate-300">
+              <li>Node.js 12+</li>
+              <li>无需额外依赖，使用内置模块即可运行</li>
+            </ul>
+            <h3 class="mt-6 text-xl font-semibold text-white">使用方法</h3>
+            <pre class="mt-4 overflow-x-auto rounded-2xl border border-slate-700/60 bg-slate-950/70 p-5 text-sm leading-relaxed text-slate-200"><code># 基本使用
 node assets_localizer.js input.html target_directory
 
 # 示例
-node assets_localizer.js index.html myProject</pre
-                    >
-              </div>
-            </div>
+node assets_localizer.js index.html myProject</code></pre>
+          </div>
+        </div>
+
+        <div class="space-y-6">
+          <div class="rounded-3xl border border-white/10 bg-white/5 p-8 shadow-lg shadow-black/30">
+            <h3 class="text-xl font-semibold text-white">浏览器界面</h3>
+            <p class="mt-3 text-sm leading-relaxed text-slate-300">
+              直接在本页面上传 HTML 文件，无需安装额外依赖，适合快速验证或临时处理资源。
+            </p>
+            <p class="mt-3 text-sm leading-relaxed text-slate-300">
+              处理完成后会生成压缩包，包含更新后的 HTML 与下载到本地的静态资源。
+            </p>
+          </div>
+          <div class="rounded-3xl border border-white/10 bg-white/5 p-8 shadow-lg shadow-black/30">
+            <h3 class="text-xl font-semibold text-white">最佳实践</h3>
+            <ul class="mt-3 list-disc space-y-2 pl-6 text-sm text-slate-300">
+              <li>在提交前使用 <code class="rounded bg-slate-800/60 px-2 py-1 text-xs text-slate-100">pnpm test</code> 验证完整流程。</li>
+              <li>本地化产物建议放入版本控制，确保环境一致。</li>
+              <li>对大型资源库可结合缓存策略与断点续传进一步提速。</li>
+            </ul>
           </div>
         </div>
       </div>
-    </div>
-  </div>
+    </section>
 
-  <div class="row mb-5">
-    <div class="col-lg-12">
-      <h2 class="text-center mb-4">使用示例</h2>
-      <div class="card shadow-sm">
-        <div class="card-body">
-          <h5>输入HTML文件</h5>
-          <div class="code-block">
-                <pre>
-&lt;!DOCTYPE html&gt;
+    <section class="border-t border-white/10 py-16">
+      <div class="rounded-3xl border border-white/10 bg-white/5 p-8 shadow-lg shadow-black/30 sm:p-10">
+        <h2 class="text-3xl font-semibold text-white sm:text-4xl">使用示例</h2>
+        <div class="mt-8 grid gap-8 lg:grid-cols-3">
+          <div class="lg:col-span-1">
+            <h3 class="text-xl font-semibold text-white">输入 HTML 文件</h3>
+            <p class="mt-3 text-sm leading-relaxed text-slate-300">
+              假设页面引用了来自 CDN 的 Bootstrap 与 jQuery，我们希望将其拉取到本地。
+            </p>
+          </div>
+          <div class="lg:col-span-2">
+            <pre class="code-block overflow-x-auto rounded-2xl border border-slate-700/60 bg-slate-950/70 p-5 text-sm leading-relaxed text-slate-200"><code>&lt;!DOCTYPE html&gt;
 &lt;html&gt;
 &lt;head&gt;
     &lt;title&gt;示例页面&lt;/title&gt;
@@ -259,19 +276,24 @@ node assets_localizer.js index.html myProject</pre
     &lt;h1&gt;Hello World&lt;/h1&gt;
     &lt;script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"&gt;&lt;/script&gt;
 &lt;/body&gt;
-&lt;/html&gt;</pre
-                >
+&lt;/html&gt;</code></pre>
           </div>
+        </div>
 
-          <h5 class="mt-4">运行工具</h5>
-          <div class="code-block">
-            <pre>npx html-assets-localizer example.html ./output</pre>
+        <div class="mt-10 grid gap-8 lg:grid-cols-[0.9fr,1.1fr] lg:items-start">
+          <div>
+            <h3 class="text-xl font-semibold text-white">运行工具</h3>
+            <p class="mt-3 text-sm leading-relaxed text-slate-300">
+              使用 CLI 版本能够快速完成批量本地化：
+            </p>
+            <pre class="code-block mt-4 overflow-x-auto rounded-2xl border border-slate-700/60 bg-slate-950/70 p-5 text-sm leading-relaxed text-slate-200"><code>npx html-assets-localizer example.html ./output</code></pre>
           </div>
-
-          <h5 class="mt-4">输出结构</h5>
-          <div class="code-block">
-                <pre>
-目标目录/
+          <div>
+            <h3 class="text-xl font-semibold text-white">输出结构</h3>
+            <p class="mt-3 text-sm leading-relaxed text-slate-300">
+              工具会生成包含 HTML 与所有静态资源的目录结构：
+            </p>
+            <pre class="code-block mt-4 overflow-x-auto rounded-2xl border border-slate-700/60 bg-slate-950/70 p-5 text-sm leading-relaxed text-slate-200"><code>目标目录/
 ├── index.html                # 处理后的HTML文件
 ├── js/                       # JavaScript文件目录
 │   ├── jquery.min.js
@@ -280,98 +302,75 @@ node assets_localizer.js index.html myProject</pre
 └── css/                      # CSS文件目录
     ├── bootstrap.min.css
     ├── style_def456.css
-    └── main.css</pre
-                >
+    └── main.css</code></pre>
           </div>
         </div>
       </div>
-    </div>
-  </div>
+    </section>
 
-  <div class="row mb-5">
-    <div class="col-lg-12">
-      <h2 class="text-center mb-4">作为模块使用</h2>
-      <div class="card shadow-sm">
-        <div class="card-body">
-          <ul class="nav nav-tabs" id="moduleTab" role="tablist">
-            <li class="nav-item" role="presentation">
-              <button
-                      class="nav-link active"
-                      id="nodejs-module-tab"
-                      data-bs-toggle="tab"
-                      data-bs-target="#nodejs-module"
-                      type="button"
-                      role="tab"
-                      aria-controls="nodejs-module"
-                      aria-selected="true"
-              >
-                Node.js
-              </button>
-            </li>
-          </ul>
-          <div class="tab-content" id="moduleTabContent">
-            <div
-                    class="tab-pane fade show active"
-                    id="nodejs-module"
-                    role="tabpanel"
-                    aria-labelledby="nodejs-module-tab"
-            >
-              <div class="code-block mt-3">
-                    <pre>
-const HTMLScriptLocalizer = require('./assets_localizer');
+    <section class="border-t border-white/10 py-16">
+      <div class="rounded-3xl border border-white/10 bg-white/5 p-8 shadow-lg shadow-black/30 sm:p-10">
+        <div class="flex flex-col gap-6 lg:flex-row lg:items-start">
+          <div class="lg:w-1/3">
+            <h2 class="text-3xl font-semibold text-white sm:text-4xl">作为模块使用</h2>
+            <p class="mt-4 text-sm leading-relaxed text-slate-300">
+              在 Node.js 项目中直接引入模块，可与现有业务流程无缝集成，结合自动化流程实现持续本地化。
+            </p>
+          </div>
+          <div class="lg:w-2/3">
+            <pre class="code-block overflow-x-auto rounded-2xl border border-slate-700/60 bg-slate-950/70 p-5 text-sm leading-relaxed text-slate-200"><code>const HTMLScriptLocalizer = require('./assets_localizer');
 
 // 创建实例
 const localizer = new HTMLScriptLocalizer('input.html', 'target_directory');
 
 // 处理文件
-localizer.process();</pre
-                    >
-              </div>
-            </div>
+localizer.process();</code></pre>
           </div>
         </div>
       </div>
-    </div>
-  </div>
-</div>
+    </section>
+  </main>
 
-<footer class="bg-dark text-white py-4">
-  <div class="container">
-    <div class="row">
-      <div class="col-md-6">
-        <h5>HTML Assets Localizer</h5>
-        <p>一个用于将HTML文件中的外部资源本地化的工具</p>
-      </div>
-      <div class="col-md-3">
-        <h5>链接</h5>
-        <ul class="list-unstyled">
-          <li>
-            <a
-                    href="https://github.com/YangsonHung/html-assets-localizer"
-                    class="text-white"
-            >GitHub</a
-            >
-          </li>
-          <li><a href="#" class="text-white">文档</a></li>
-        </ul>
-      </div>
-      <div class="col-md-3">
-        <h5>许可证</h5>
-        <p>MIT License</p>
-      </div>
-    </div>
-    <div class="row mt-3">
-      <div class="col-12 text-center">
-        <p class="mb-0">
-          &copy; 2025 HTML Assets Localizer. All rights reserved.
+  <footer class="border-t border-white/10 bg-slate-950/80">
+    <div class="mx-auto flex max-w-6xl flex-col gap-10 px-6 py-12 sm:px-8 lg:flex-row lg:justify-between">
+      <div class="max-w-lg space-y-3">
+        <h2 class="text-2xl font-semibold text-white">HTML Assets Localizer</h2>
+        <p class="text-sm leading-relaxed text-slate-300">
+          将分布在各个 CDN 的前端资源拉回本地，配合构建管线或离线部署，让项目在任何网络环境下都能稳定运行。
         </p>
       </div>
+      <div class="grid flex-1 grid-cols-1 gap-10 text-sm text-slate-300 sm:grid-cols-2 lg:grid-cols-3">
+        <div>
+          <h3 class="text-base font-semibold text-white">链接</h3>
+          <ul class="mt-3 space-y-2">
+            <li>
+              <a
+                href="https://github.com/YangsonHung/html-assets-localizer"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="transition hover:text-white"
+              >GitHub</a>
+            </li>
+            <li><span class="opacity-70">文档（即将上线）</span></li>
+          </ul>
+        </div>
+        <div>
+          <h3 class="text-base font-semibold text-white">许可证</h3>
+          <p class="mt-3 opacity-80">MIT License</p>
+        </div>
+        <div>
+          <h3 class="text-base font-semibold text-white">联系我们</h3>
+          <p class="mt-3 opacity-80">欢迎提交 Issue 或 PR 共同完善工具。</p>
+        </div>
+      </div>
     </div>
-  </div>
-</footer>
+    <div class="border-t border-white/10 py-6 text-center text-xs text-slate-500">
+      &copy; 2025 HTML Assets Localizer. All rights reserved.
+    </div>
+  </footer>
+</div>
 
 <script src="https://unpkg.com/html-assets-localizer/dist/index.umd.js"></script>
 <script type="module" src="./index.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
