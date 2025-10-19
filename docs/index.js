@@ -1,20 +1,20 @@
 
 (() => {
   const selectionVariantClasses = {
-    info: 'border border-sky-400/40 bg-sky-500/10 text-sky-100',
-    success: 'border border-emerald-400/40 bg-emerald-500/10 text-emerald-100',
-    warning: 'border border-amber-400/40 bg-amber-500/10 text-amber-100',
-    danger: 'border border-rose-400/40 bg-rose-500/10 text-rose-100',
+    info: 'border border-sky-400/40 bg-sky-500/10 text-sky-100 dark:border-sky-400/40 dark:bg-sky-500/10 dark:text-sky-100 border-sky-600/40 bg-sky-50 text-sky-800',
+    success: 'border border-emerald-400/40 bg-emerald-500/10 text-emerald-100 dark:border-emerald-400/40 dark:bg-emerald-500/10 dark:text-emerald-100 border-emerald-600/40 bg-emerald-50 text-emerald-800',
+    warning: 'border border-amber-400/40 bg-amber-500/10 text-amber-100 dark:border-amber-400/40 dark:bg-amber-500/10 dark:text-amber-100 border-amber-600/40 bg-amber-50 text-amber-800',
+    danger: 'border border-rose-400/40 bg-rose-500/10 text-rose-100 dark:border-rose-400/40 dark:bg-rose-500/10 dark:text-rose-100 border-rose-600/40 bg-rose-50 text-rose-800',
   };
 
   const selectionVariantClassList = Object.values(selectionVariantClasses).join(' ');
 
   const logLevelClasses = {
-    success: 'text-emerald-400',
-    warning: 'text-amber-200',
-    danger: 'text-rose-300',
-    info: 'text-sky-300',
-    default: 'text-slate-200',
+    success: 'text-emerald-600 dark:text-emerald-400',
+    warning: 'text-amber-600 dark:text-amber-200',
+    danger: 'text-rose-600 dark:text-rose-300',
+    info: 'text-sky-600 dark:text-sky-300',
+    default: 'text-slate-700 dark:text-slate-200',
   };
 
   const state = {
@@ -37,14 +37,17 @@
           secondaryCta: 'View on GitHub',
         },
         language: { label: 'Language' },
+        theme: { label: 'Theme' },
         online: {
-          title: 'Browser playground',
+          title: 'Online Tool',
           description:
             'Upload an HTML file and get a self-contained zip bundle with every remote asset downloaded and paths rewritten.',
           helper:
-            'Understands <code>script</code>、<code>link</code>、<code>img</code> tags that use <code>http(s)</code> URLs.',
+            'Supports <code>script</code>, <code>link</code>, and <code>img</code> tags with <code>http(s)</code> URLs.',
           fileLabel: 'Choose HTML file',
           fileHint: 'Only documents that reference http(s) resources are supported.',
+          fileInputPlaceholder: 'No file selected',
+          fileInputButton: 'Choose file',
           buttons: {
             process: 'Process & download bundle',
             reset: 'Reset',
@@ -107,7 +110,7 @@
         },
         installation: {
           title: 'Installation',
-          subtitle: 'Follow the same setup paths described in the README.',
+          subtitle: 'Two simple ways to get started with HTML Assets Localizer.',
           cards: [
             {
               badge: 'Local development',
@@ -144,8 +147,8 @@
           ],
         },
         cli: {
-          title: 'CLI workflow',
-          subtitle: 'Automate localization right from the terminal.',
+          title: 'CLI Workflow',
+          subtitle: 'Automate localization directly from the command line.',
           sections: [
             {
               title: 'Basic usage',
@@ -167,7 +170,7 @@
           ],
           commands: {
             title: 'Handy commands',
-            description: 'The CLI exposes the same helpers referenced in the README.',
+            description: 'The CLI provides these useful commands for quick access.',
             headers: {
               command: 'Command',
               description: 'Description',
@@ -276,12 +279,15 @@
           secondaryCta: '查看 GitHub',
         },
         language: { label: '选择语言' },
+        theme: { label: '主题模式' },
         online: {
-          title: '浏览器试玩',
+          title: '在线工具',
           description: '上传包含外部资源的 HTML，浏览器端会下载依赖并生成可离线使用的压缩包。',
-          helper: '兼容 <code>script</code>、<code>link</code>、<code>img</code> 中的 <code>http(s)</code> 资源，与 README 描述一致。',
+          helper: '兼容 <code>script</code>、<code>link</code>、<code>img</code> 中的 <code>http(s)</code> 资源。',
           fileLabel: '选择 HTML 文件',
           fileHint: '目前仅支持引用 http(s) 资源的页面。',
+          fileInputPlaceholder: '未选择任何文件',
+          fileInputButton: '选择文件',
           buttons: {
             process: '本地化并下载压缩包',
             reset: '重置',
@@ -316,7 +322,7 @@
         },
         features: {
           title: '核心特性',
-          subtitle: '依据 README 梳理的重点能力，帮助你快速了解本地化流程。',
+          subtitle: '这些重点能力帮助你快速了解本地化流程。',
           items: [
             {
               icon: '🚀',
@@ -342,7 +348,7 @@
         },
         installation: {
           title: '安装方式',
-          subtitle: '与 README 保持一致的两条路径：开发调试或全局安装。',
+          subtitle: '两种简单方式开始使用 HTML Assets Localizer。',
           cards: [
             {
               badge: '本地开发',
@@ -375,7 +381,7 @@
         },
         cli: {
           title: 'CLI 工作流',
-          subtitle: '命令行依旧是 README 推荐的主力流程。',
+          subtitle: '直接通过命令行自动化本地化处理。',
           sections: [
             {
               title: '基础用法',
@@ -397,7 +403,7 @@
           ],
           commands: {
             title: '常用命令',
-            description: '与 README 中的指令保持一致。',
+            description: 'CLI 提供这些常用命令以便快速访问。',
             headers: { command: '命令', description: '说明' },
             items: [
               { command: 'hal help', description: '查看帮助信息。' },
@@ -428,7 +434,7 @@
         },
         output: {
           title: '输出结构',
-          subtitle: '最终产物与 README 中的结构完全一致。',
+          subtitle: '本地化处理后的文件结构说明。',
           structure:
             'output-dir/\n' +
             '├── index.html          # 路径已更新的 HTML 文件\n' +
@@ -496,6 +502,7 @@
     refs.logOutput = document.getElementById('logOutput');
     refs.resourceTableWrapper = document.getElementById('resourceTableWrapper');
     refs.resourceTableBody = document.querySelector('#resourceTable tbody');
+    refs.themeToggle = document.getElementById('themeToggle');
 
     const defaultLanguage = determineDefaultLanguage();
 
@@ -511,6 +518,7 @@
         resources,
       })
       .then(() => {
+        setupThemeToggle();
         setupLanguageToggle();
         initOnlineTool();
         updateLanguageUI();
@@ -546,6 +554,7 @@
 
     updateLanguageButtons();
     updateStaticTexts();
+    updateFileInputText();
     renderFeatures();
     renderInstallationCards();
     renderCLISections();
@@ -563,22 +572,97 @@
     document.querySelectorAll('.lang-toggle').forEach((button) => {
       const isActive = button.dataset.lang === i18next.language;
       button.setAttribute('aria-pressed', String(isActive));
-      button.classList.toggle('bg-white', isActive);
-      button.classList.toggle('text-slate-950', isActive);
+      button.classList.toggle('bg-brand-500', isActive);
+      button.classList.toggle('dark:bg-white', isActive);
+      button.classList.toggle('text-white', isActive);
+      button.classList.toggle('dark:text-slate-950', isActive);
+      button.classList.toggle('text-slate-600', !isActive);
+      button.classList.toggle('dark:text-slate-200', !isActive);
       button.classList.toggle('shadow-brand-glow', isActive);
-      button.classList.toggle('text-slate-200', !isActive);
     });
+  }
+
+  function setupThemeToggle() {
+    if (!refs.themeToggle) {
+      return;
+    }
+
+    refs.themeToggle.addEventListener('change', (event) => {
+      const isDark = event.target.checked;
+      if (isDark) {
+        document.documentElement.classList.add('dark');
+        localStorage.setItem('hal-theme', 'dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+        localStorage.setItem('hal-theme', 'light');
+      }
+    });
+
+    const storedTheme = localStorage.getItem('hal-theme');
+    if (storedTheme === 'dark') {
+      document.documentElement.classList.add('dark');
+      refs.themeToggle.checked = true;
+    } else if (storedTheme === 'light') {
+      document.documentElement.classList.remove('dark');
+      refs.themeToggle.checked = false;
+    } else {
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      if (prefersDark) {
+        document.documentElement.classList.add('dark');
+        refs.themeToggle.checked = true;
+      } else {
+        document.documentElement.classList.remove('dark');
+        refs.themeToggle.checked = false;
+      }
+    }
   }
 
   function updateStaticTexts() {
     document.querySelectorAll('[data-i18n]').forEach((node) => {
       const key = node.getAttribute('data-i18n');
-      node.textContent = key ? i18next.t(key) : '';
+      if (key) {
+        const translatedText = i18next.t(key);
+        node.textContent = translatedText;
+      }
     });
     document.querySelectorAll('[data-i18n-html]').forEach((node) => {
       const key = node.getAttribute('data-i18n-html');
-      node.innerHTML = key ? i18next.t(key) : '';
+      if (key) {
+        const translatedHTML = i18next.t(key);
+        node.innerHTML = translatedHTML;
+      }
     });
+    document.querySelectorAll('[data-i18n-placeholder]').forEach((node) => {
+      const key = node.getAttribute('data-i18n-placeholder');
+      if (key) {
+        const translatedText = i18next.t(key);
+        node.textContent = translatedText;
+      }
+    });
+  }
+
+  function updateFileInputText() {
+    if (!refs.fileInput) return;
+    
+    // 更新自定义文件输入组件的文本
+    const fileInputText = document.getElementById('fileInputText');
+    const fileInputButton = document.getElementById('fileInputButton');
+    
+    if (fileInputText) {
+      fileInputText.textContent = i18next.t('online.fileInputPlaceholder');
+    }
+    
+    if (fileInputButton) {
+      fileInputButton.textContent = i18next.t('online.fileInputButton');
+    }
+    
+    // 如果已选择文件，显示文件名
+    if (refs.fileInput.files && refs.fileInput.files.length > 0) {
+      const file = refs.fileInput.files[0];
+      if (fileInputText) {
+        fileInputText.textContent = file.name;
+      }
+    }
   }
 
   function renderFeatures() {
@@ -589,19 +673,19 @@
     items.forEach((item) => {
       const card = document.createElement('div');
       card.className =
-        'group rounded-3xl border border-white/10 bg-white/5 p-8 shadow-lg shadow-black/30 transition hover:border-brand-300/60 hover:bg-brand-400/10';
+        'group rounded-3xl border border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 p-8 shadow-lg dark:shadow-black/30 transition hover:border-brand-300/60 dark:hover:bg-brand-400/10 hover:bg-brand-50/10';
 
       const icon = document.createElement('div');
       icon.className =
-        'flex h-12 w-12 items-center justify-center rounded-2xl bg-brand-500/20 text-brand-200 transition group-hover:text-brand-100 text-2xl';
+        'flex h-12 w-12 items-center justify-center rounded-2xl bg-brand-500/20 dark:bg-brand-500/20 text-brand-600 dark:text-brand-200 transition group-hover:text-brand-700 dark:group-hover:text-brand-100 text-2xl';
       icon.textContent = item.icon || '';
 
       const title = document.createElement('h3');
-      title.className = 'mt-6 text-xl font-semibold text-white';
+      title.className = 'mt-6 text-xl font-semibold text-slate-900 dark:text-white';
       title.textContent = item.title || '';
 
       const description = document.createElement('p');
-      description.className = 'mt-3 text-sm leading-relaxed text-slate-300';
+      description.className = 'mt-3 text-sm leading-relaxed text-slate-600 dark:text-slate-300';
       description.textContent = item.description || '';
 
       card.append(icon, title, description);
@@ -617,24 +701,24 @@
     cards.forEach((data) => {
       const card = document.createElement('div');
       card.className =
-        'rounded-3xl border border-white/10 bg-slate-900/70 p-8 shadow-lg shadow-black/30';
+        'rounded-3xl border border-slate-200 dark:border-white/10 bg-white dark:bg-slate-900/70 p-8 shadow-lg dark:shadow-black/30';
 
       const badge = document.createElement('span');
       badge.className =
-        'inline-flex items-center rounded-full bg-brand-500/20 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-brand-100';
+        'inline-flex items-center rounded-full bg-brand-500/20 dark:bg-brand-500/20 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-brand-700 dark:text-brand-100';
       badge.textContent = data.badge || '';
 
       const title = document.createElement('h3');
-      title.className = 'mt-4 text-xl font-semibold text-white';
+      title.className = 'mt-4 text-xl font-semibold text-slate-900 dark:text-white';
       title.textContent = data.title || '';
 
       const description = document.createElement('p');
-      description.className = 'mt-3 text-sm leading-relaxed text-slate-300';
+      description.className = 'mt-3 text-sm leading-relaxed text-slate-600 dark:text-slate-300';
       description.textContent = data.description || '';
 
       const codeBlock = document.createElement('pre');
       codeBlock.className =
-        'scrollbar-thin mt-6 overflow-x-auto rounded-2xl border border-slate-700/60 bg-slate-950/70 p-5 text-sm leading-relaxed text-slate-200 font-mono';
+        'scrollbar-thin mt-6 overflow-x-auto rounded-2xl border border-slate-300 dark:border-slate-700/60 bg-slate-50 dark:bg-slate-950/70 p-5 text-sm leading-relaxed text-slate-700 dark:text-slate-200 font-mono';
       const code = document.createElement('code');
       code.textContent = data.code || '';
       codeBlock.append(code);
@@ -643,7 +727,7 @@
 
       if (Array.isArray(data.notes) && data.notes.length) {
         const list = document.createElement('ul');
-        list.className = 'mt-4 list-disc space-y-2 pl-6 text-sm text-slate-300';
+        list.className = 'mt-4 list-disc space-y-2 pl-6 text-sm text-slate-600 dark:text-slate-300';
         data.notes.forEach((note) => {
           const item = document.createElement('li');
           item.textContent = note;
@@ -664,16 +748,16 @@
     sections.forEach((section) => {
       const card = document.createElement('div');
       card.className =
-        'rounded-3xl border border-white/10 bg-slate-900/70 p-8 shadow-lg shadow-black/30';
+        'rounded-3xl border border-slate-200 dark:border-white/10 bg-white dark:bg-slate-900/70 p-8 shadow-lg dark:shadow-black/30';
 
       const title = document.createElement('h3');
-      title.className = 'text-xl font-semibold text-white';
+      title.className = 'text-xl font-semibold text-slate-900 dark:text-white';
       title.textContent = section.title || '';
       card.append(title);
 
       if (section.description) {
         const description = document.createElement('p');
-        description.className = 'mt-3 text-sm leading-relaxed text-slate-300';
+        description.className = 'mt-3 text-sm leading-relaxed text-slate-600 dark:text-slate-300';
         description.textContent = section.description;
         card.append(description);
       }
@@ -681,7 +765,7 @@
       if (section.code) {
         const codeBlock = document.createElement('pre');
         codeBlock.className =
-          'scrollbar-thin mt-6 overflow-x-auto rounded-2xl border border-slate-700/60 bg-slate-950/70 p-5 text-sm leading-relaxed text-slate-200 font-mono';
+          'scrollbar-thin mt-6 overflow-x-auto rounded-2xl border border-slate-300 dark:border-slate-700/60 bg-slate-50 dark:bg-slate-950/70 p-5 text-sm leading-relaxed text-slate-700 dark:text-slate-200 font-mono';
         const code = document.createElement('code');
         code.textContent = section.code;
         codeBlock.append(code);
@@ -690,7 +774,7 @@
 
       if (Array.isArray(section.list) && section.list.length) {
         const list = document.createElement('ul');
-        list.className = 'mt-6 list-disc space-y-2 pl-6 text-sm text-slate-300';
+        list.className = 'mt-6 list-disc space-y-2 pl-6 text-sm text-slate-600 dark:text-slate-300';
         section.list.forEach((entry) => {
           const item = document.createElement('li');
           item.textContent = entry;
@@ -712,11 +796,11 @@
       const tr = document.createElement('tr');
 
       const commandCell = document.createElement('td');
-      commandCell.className = 'px-4 py-3 align-top font-mono text-slate-200';
+      commandCell.className = 'px-4 py-3 align-top font-mono text-slate-700 dark:text-slate-200';
       commandCell.textContent = row.command || '';
 
       const descriptionCell = document.createElement('td');
-      descriptionCell.className = 'px-4 py-3 align-top text-slate-300';
+      descriptionCell.className = 'px-4 py-3 align-top text-slate-600 dark:text-slate-300';
       descriptionCell.textContent = row.description || '';
 
       tr.append(commandCell, descriptionCell);
@@ -732,19 +816,19 @@
     cards.forEach((data) => {
       const card = document.createElement('div');
       card.className =
-        'rounded-3xl border border-white/10 bg-slate-900/70 p-8 shadow-lg shadow-black/30';
+        'rounded-3xl border border-slate-200 dark:border-white/10 bg-white dark:bg-slate-900/70 p-8 shadow-lg dark:shadow-black/30';
 
       const title = document.createElement('h3');
-      title.className = 'text-xl font-semibold text-white';
+      title.className = 'text-xl font-semibold text-slate-900 dark:text-white';
       title.textContent = data.title || '';
 
       const description = document.createElement('p');
-      description.className = 'mt-3 text-sm leading-relaxed text-slate-300';
+      description.className = 'mt-3 text-sm leading-relaxed text-slate-600 dark:text-slate-300';
       description.textContent = data.description || '';
 
       const codeBlock = document.createElement('pre');
       codeBlock.className =
-        'scrollbar-thin mt-6 overflow-x-auto rounded-2xl border border-slate-700/60 bg-slate-950/70 p-5 text-sm leading-relaxed text-slate-200 font-mono';
+        'scrollbar-thin mt-6 overflow-x-auto rounded-2xl border border-slate-300 dark:border-slate-700/60 bg-slate-50 dark:bg-slate-950/70 p-5 text-sm leading-relaxed text-slate-700 dark:text-slate-200 font-mono';
       const code = document.createElement('code');
       code.textContent = data.code || '';
       codeBlock.append(code);
@@ -762,16 +846,16 @@
     columns.forEach((column) => {
       const card = document.createElement('div');
       card.className =
-        'rounded-3xl border border-white/10 bg-white/5 p-6 shadow-lg shadow-black/30';
+        'rounded-3xl border border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 p-6 shadow-lg dark:shadow-black/30';
 
       const title = document.createElement('h3');
-      title.className = 'text-lg font-semibold text-white';
+      title.className = 'text-lg font-semibold text-slate-900 dark:text-white';
       title.textContent = column.title || '';
       card.append(title);
 
       if (Array.isArray(column.items) && column.items.length) {
         const list = document.createElement('ul');
-        list.className = 'mt-4 space-y-2 text-sm text-slate-300';
+        list.className = 'mt-4 space-y-2 text-sm text-slate-600 dark:text-slate-300';
         column.items.forEach((item) => {
           const entry = document.createElement('li');
           entry.textContent = item;
@@ -795,7 +879,7 @@
       link.href = item.url || '#';
       link.target = '_blank';
       link.rel = 'noopener noreferrer';
-      link.className = 'text-sky-300 hover:text-sky-100 transition';
+      link.className = 'text-sky-600 dark:text-sky-300 hover:text-sky-700 dark:hover:text-sky-100 transition';
       link.textContent = item.label || '';
       li.append(link);
       container.append(li);
@@ -823,14 +907,34 @@
     refs.fileInput?.addEventListener('change', handleFileChange);
     refs.processButton?.addEventListener('click', () => void processFile());
     refs.resetButton?.addEventListener('click', resetState);
+    
+    // 设置自定义文件输入组件的事件监听
+    const customFileInput = document.getElementById('customFileInput');
+    const fileInputButton = document.getElementById('fileInputButton');
+    
+    if (customFileInput && refs.fileInput) {
+      customFileInput.addEventListener('click', () => {
+        refs.fileInput.click();
+      });
+    }
+    
+    if (fileInputButton && refs.fileInput) {
+      fileInputButton.addEventListener('click', (e) => {
+        e.stopPropagation();
+        refs.fileInput.click();
+      });
+    }
   }
 
   function handleFileChange(event) {
     const file = event.target.files && event.target.files[0];
+    const fileInputText = document.getElementById('fileInputText');
+    
     if (!file) {
       resetState();
       setSelection({ key: 'online.messages.selectPrompt', variant: 'warning' });
       appendLog({ key: 'online.messages.selectPrompt', level: 'warning' });
+      updateFileInputText(); // 更新文件选择提示文本
       return;
     }
     state.selectedFile = file;
@@ -842,6 +946,11 @@
     appendLog({ key: 'online.logs.fileReady', level: 'success' });
     refs.resetButton && (refs.resetButton.disabled = false);
     updateProcessButtonState();
+    
+    // 更新文件输入文本显示文件名
+    if (fileInputText) {
+      fileInputText.textContent = file.name;
+    }
   }
 
   async function processFile() {
@@ -912,6 +1021,7 @@
     renderResourceTable();
     renderSelection();
     updateProcessButtonState();
+    updateFileInputText(); // 更新文件输入组件文本
   }
 
   function toggleProcessingState(isProcessing) {
@@ -950,15 +1060,17 @@
     const { visible, key, params, variant, raw } = state.selection;
     if (!visible) {
       refs.selectionInfo.className =
-        'mt-8 hidden rounded-2xl px-4 py-3 text-sm leading-relaxed shadow-lg shadow-black/20';
+        'mt-8 hidden rounded-2xl px-4 py-3 text-sm leading-relaxed shadow-lg dark:shadow-black/20';
       refs.selectionInfo.textContent = '';
       return;
     }
-    refs.selectionInfo.className = `mt-8 rounded-2xl px-4 py-3 text-sm leading-relaxed shadow-lg shadow-black/20 ${selectionVariantClasses[variant] || selectionVariantClasses.info}`;
+    refs.selectionInfo.className = `mt-8 rounded-2xl px-4 py-3 text-sm leading-relaxed shadow-lg dark:shadow-black/20 ${selectionVariantClasses[variant] || selectionVariantClasses.info}`;
     if (raw) {
       refs.selectionInfo.textContent = raw;
     } else if (key) {
-      refs.selectionInfo.textContent = i18next.t(key, params || {});
+      // 确保在语言切换时重新翻译文本
+      const translatedText = i18next.t(key, params || {});
+      refs.selectionInfo.textContent = translatedText;
     } else {
       refs.selectionInfo.textContent = '';
     }
@@ -983,6 +1095,7 @@
       const item = document.createElement('div');
       item.className = `mb-1 text-xs sm:text-sm ${logLevelClasses[entry.level] || logLevelClasses.default}`;
       const time = entry.timestamp.toLocaleTimeString(i18next.language === 'zh' ? 'zh-CN' : 'en-US');
+      // 确保在语言切换时重新翻译日志消息
       const message = entry.raw ? entry.raw : i18next.t(entry.key, entry.params || {});
       item.textContent = `[${time}] ${message}`;
       refs.logOutput.append(item);
@@ -1011,7 +1124,7 @@
       typeCell.textContent = asset.type || '-';
 
       const originalCell = document.createElement('td');
-      originalCell.className = 'px-4 py-3 align-top text-sky-200 hover:text-sky-100 break-words';
+      originalCell.className = 'px-4 py-3 align-top text-sky-600 dark:text-sky-200 hover:text-sky-700 dark:hover:text-sky-100 break-words';
       if (asset.originalUrl) {
         const link = document.createElement('a');
         link.href = asset.originalUrl;
@@ -1025,11 +1138,11 @@
       }
 
       const localCell = document.createElement('td');
-      localCell.className = 'px-4 py-3 align-top text-slate-300 break-words';
+      localCell.className = 'px-4 py-3 align-top text-slate-600 dark:text-slate-300 break-words';
       localCell.textContent = asset.localRelativePath || '-';
 
       const sizeCell = document.createElement('td');
-      sizeCell.className = 'px-4 py-3 text-right align-top text-slate-200';
+      sizeCell.className = 'px-4 py-3 text-right align-top text-slate-700 dark:text-slate-200';
       sizeCell.textContent = formatBytes(asset.bytesWritten);
 
       row.append(typeCell, originalCell, localCell, sizeCell);

@@ -4,6 +4,19 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>HTML Assets Localizer</title>
+  <script>
+    (function () {
+      try {
+        const stored = localStorage.getItem('hal-theme');
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        if (stored === 'dark' || (!stored && prefersDark)) {
+          document.documentElement.classList.add('dark');
+        }
+      } catch (error) {
+        console.warn('Theme preference detection failed.', error);
+      }
+    })();
+  </script>
   <script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
   <script>
     tailwind.config = {
@@ -52,57 +65,73 @@
   <script src="https://unpkg.com/html-assets-localizer/dist/index.umd.js" defer></script>
   <script src="./index.js" defer></script>
 </head>
-<body class="min-h-screen bg-slate-950 text-slate-100 antialiased font-sans">
-<div class="relative isolate flex min-h-screen flex-col">
+<body class="min-h-screen bg-white text-slate-900 antialiased font-sans transition-colors duration-300 dark:bg-slate-950 dark:text-slate-100">
+<div class="relative isolate flex min-h-screen flex-col transition-colors duration-300">
   <div aria-hidden="true" class="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
-    <div class="absolute left-1/2 top-[-12rem] h-[32rem] w-[48rem] -translate-x-1/2 rounded-full bg-brand-500/20 blur-3xl"></div>
-    <div class="absolute right-[-18rem] bottom-[-16rem] h-[28rem] w-[44rem] rounded-full bg-pink-500/20 blur-3xl"></div>
-    <div class="absolute left-[-12rem] bottom-[-10rem] h-[22rem] w-[30rem] rounded-full bg-sky-500/10 blur-3xl"></div>
+    <div class="absolute left-1/2 top-[-12rem] h-[32rem] w-[48rem] -translate-x-1/2 rounded-full bg-brand-200/50 blur-3xl dark:bg-brand-500/20"></div>
+    <div class="absolute right-[-18rem] bottom-[-16rem] h-[28rem] w-[44rem] rounded-full bg-pink-200/40 blur-3xl dark:bg-pink-500/20"></div>
+    <div class="absolute left-[-12rem] bottom-[-10rem] h-[22rem] w-[30rem] rounded-full bg-sky-200/40 blur-3xl dark:bg-sky-500/10"></div>
   </div>
 
   <header class="px-6 pt-10 sm:px-10">
     <div class="mx-auto flex w-full max-w-6xl flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
       <div>
-        <span class="inline-flex items-center rounded-full border border-white/20 bg-white/10 px-4 py-1 text-xs font-semibold uppercase tracking-wide text-slate-100" data-i18n="hero.tagline"></span>
-        <h1 class="mt-4 text-3xl font-bold tracking-tight text-white sm:text-4xl" data-i18n="hero.title"></h1>
+        <span class="inline-flex items-center rounded-full border border-slate-200 bg-slate-100 px-4 py-1 text-xs font-semibold uppercase tracking-wide text-slate-600 transition-colors duration-300 dark:border-white/20 dark:bg-white/10 dark:text-slate-100" data-i18n="hero.tagline"></span>
+        <h1 class="mt-4 text-3xl font-bold tracking-tight text-slate-900 transition-colors duration-300 dark:text-white sm:text-4xl" data-i18n="hero.title"></h1>
       </div>
       <div class="flex items-center gap-3">
-        <span class="text-sm text-slate-300" data-i18n="language.label"></span>
-        <div class="inline-flex rounded-full border border-white/20 bg-white/10 p-1">
-          <button type="button" data-lang="zh" class="lang-toggle rounded-full px-4 py-2 text-xs font-semibold uppercase tracking-wide text-slate-200 transition hover:bg-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white">中文</button>
-          <button type="button" data-lang="en" class="lang-toggle rounded-full px-4 py-2 text-xs font-semibold uppercase tracking-wide text-slate-200 transition hover:bg-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white">EN</button>
+        <span class="text-sm text-slate-500 transition-colors duration-300 dark:text-slate-300" data-i18n="language.label"></span>
+        <div class="inline-flex rounded-full border border-slate-200 bg-white p-1 transition-colors duration-300 dark:border-white/20 dark:bg-white/10">
+          <button type="button" data-lang="zh" class="lang-toggle rounded-full px-4 py-2 text-xs font-semibold uppercase tracking-wide text-slate-600 transition hover:bg-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500 dark:text-slate-200 dark:hover:bg-white/10 dark:focus-visible:outline-white">中文</button>
+          <button type="button" data-lang="en" class="lang-toggle rounded-full px-4 py-2 text-xs font-semibold uppercase tracking-wide text-slate-600 transition hover:bg-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500 dark:text-slate-200 dark:hover:bg-white/10 dark:focus-visible:outline-white">EN</button>
+        </div>
+        <div class="h-6 w-px bg-slate-200 transition-colors duration-300 dark:bg-white/20"></div>
+        <div class="flex items-center gap-2">
+          <span class="text-xs font-medium text-slate-500 transition-colors duration-300 dark:text-slate-300" data-i18n="theme.label"></span>
+          <label class="relative inline-flex cursor-pointer items-center">
+            <input id="themeToggle" type="checkbox" class="peer sr-only" aria-label="Toggle dark mode">
+            <span class="h-6 w-10 rounded-full bg-slate-300 transition-colors duration-300 peer-checked:bg-brand-500 dark:bg-slate-600 peer-focus:outline peer-focus:outline-2 peer-focus:outline-offset-2 peer-focus:outline-brand-500"></span>
+            <span class="absolute left-0.5 top-0.5 h-5 w-5 rounded-full bg-white text-[10px] font-semibold leading-5 text-slate-600 shadow transition-all duration-300 peer-checked:translate-x-4 peer-checked:text-white peer-checked:bg-brand-500 dark:bg-slate-200 dark:text-slate-700 dark:peer-checked:bg-white dark:peer-checked:text-brand-600">☀</span>
+            <span class="pointer-events-none absolute right-0.5 top-0.5 h-5 w-5 translate-x-0 text-[10px] font-semibold leading-5 text-white opacity-0 transition-all duration-300 peer-checked:opacity-100 peer-checked:text-white">🌙</span>
+          </label>
         </div>
       </div>
     </div>
-    <div class="mx-auto mt-8 max-w-4xl text-base leading-relaxed text-slate-300" data-i18n="hero.lead"></div>
+    <div class="mx-auto mt-8 max-w-4xl text-base leading-relaxed text-slate-600 transition-colors duration-300 dark:text-slate-300" data-i18n="hero.lead"></div>
     <div class="mx-auto mt-8 flex max-w-6xl flex-col items-start gap-4 sm:flex-row sm:items-center">
-      <a href="#online-tool" class="inline-flex items-center justify-center rounded-full bg-white px-8 py-3 text-base font-semibold text-slate-950 shadow-brand-glow transition hover:bg-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white" data-i18n="hero.primaryCta"></a>
-      <a href="https://github.com/YangsonHung/html-assets-localizer" target="_blank" rel="noopener noreferrer" class="inline-flex items-center justify-center rounded-full border border-white/30 px-8 py-3 text-base font-semibold text-white transition hover:border-white hover:bg-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/60" data-i18n="hero.secondaryCta"></a>
+      <a href="#online-tool" class="inline-flex items-center justify-center rounded-full bg-brand-500 px-8 py-3 text-base font-semibold text-white shadow-brand-glow transition hover:bg-brand-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-300 dark:bg-white dark:text-slate-950 dark:hover:bg-slate-100" data-i18n="hero.primaryCta"></a>
+      <a href="https://github.com/YangsonHung/html-assets-localizer" target="_blank" rel="noopener noreferrer" class="inline-flex items-center justify-center rounded-full border border-slate-300 px-8 py-3 text-base font-semibold text-slate-700 transition hover:bg-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-300 dark:border-white/30 dark:text-white dark:hover:border-white dark:hover:bg-white/10" data-i18n="hero.secondaryCta"></a>
     </div>
   </header>
 
   <main class="mx-auto w-full max-w-6xl flex-1 px-6 pb-24 sm:px-10">
     <section id="online-tool" class="pt-20">
       <div class="text-center">
-        <h2 class="text-3xl font-semibold text-white sm:text-4xl" data-i18n="online.title"></h2>
-        <p class="mx-auto mt-4 max-w-3xl text-base leading-relaxed text-slate-300" data-i18n="online.description"></p>
+        <h2 class="text-3xl font-semibold text-slate-900 dark:text-white sm:text-4xl" data-i18n="online.title"></h2>
+        <p class="mx-auto mt-4 max-w-3xl text-base leading-relaxed text-slate-600 dark:text-slate-300" data-i18n="online.description"></p>
       </div>
 
-      <div class="mt-12 rounded-3xl border border-white/10 bg-slate-900/70 p-8 shadow-2xl shadow-black/40 backdrop-blur-xl sm:p-10">
-        <div class="text-left text-base text-slate-300" data-i18n-html="online.helper"></div>
+      <div class="mt-12 rounded-3xl border border-slate-200 dark:border-white/10 bg-white dark:bg-slate-900/70 p-8 shadow-xl dark:shadow-2xl dark:shadow-black/40 backdrop-blur-xl sm:p-10">
+        <div class="text-left text-base text-slate-600 dark:text-slate-300" data-i18n-html="online.helper"></div>
 
         <div class="mt-10 grid gap-10 lg:grid-cols-2 lg:items-end">
           <div>
-            <label for="htmlFileInput" class="text-sm font-semibold uppercase tracking-wide text-slate-300" data-i18n="online.fileLabel"></label>
-            <input id="htmlFileInput" type="file" accept=".html,.htm,text/html" class="mt-4 block w-full rounded-2xl border border-white/10 bg-slate-950/70 px-4 py-3 text-sm text-slate-100 ring-offset-slate-900 transition focus:border-brand-400 focus:outline-none focus:ring-2 focus:ring-brand-400/60 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60" />
-            <p class="mt-3 text-sm text-slate-400">
+            <label for="htmlFileInput" class="text-sm font-semibold uppercase tracking-wide text-slate-700 dark:text-slate-300" data-i18n="online.fileLabel"></label>
+            <div class="mt-4">
+              <input id="htmlFileInput" type="file" accept=".html,.htm,text/html" class="hidden" />
+              <div id="customFileInput" class="flex w-full cursor-pointer items-center justify-between rounded-2xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 ring-offset-white transition focus:border-brand-400 focus:outline-none focus:ring-2 focus:ring-brand-400/60 focus:ring-offset-2 dark:border-white/10 dark:bg-slate-950/70 dark:text-slate-100 dark:ring-offset-slate-900">
+                <span id="fileInputText" class="text-slate-500 dark:text-slate-400" data-i18n-placeholder="online.fileInputPlaceholder"></span>
+                <button type="button" id="fileInputButton" class="rounded-lg bg-brand-500 px-3 py-1 text-xs font-semibold text-white transition hover:bg-brand-400 dark:bg-white dark:text-slate-950 dark:hover:bg-slate-100" data-i18n="online.fileInputButton"></button>
+              </div>
+            </div>
+            <p class="mt-3 text-sm text-slate-500 dark:text-slate-400">
               <span data-i18n="online.fileHint"></span>
             </p>
           </div>
 
           <div class="flex flex-col gap-4 sm:flex-row sm:justify-end">
             <button id="processButton" type="button" disabled class="inline-flex items-center justify-center rounded-2xl bg-brand-500 px-6 py-3 text-base font-semibold text-white shadow-brand-glow transition hover:bg-brand-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-300 disabled:cursor-not-allowed disabled:opacity-60" data-i18n="online.buttons.process"></button>
-            <button id="resetButton" type="button" disabled class="inline-flex items-center justify-center rounded-2xl border border-white/20 px-6 py-3 text-base font-semibold text-slate-200 transition hover:border-white/40 hover:bg-white/10 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/50 disabled:cursor-not-allowed disabled:opacity-60" data-i18n="online.buttons.reset"></button>
+            <button id="resetButton" type="button" disabled class="inline-flex items-center justify-center rounded-2xl border border-slate-300 dark:border-white/20 bg-white dark:bg-transparent px-6 py-3 text-base font-semibold text-slate-700 dark:text-slate-200 transition hover:border-slate-400 dark:hover:border-white/40 hover:bg-slate-50 dark:hover:bg-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-300 dark:focus-visible:outline-white/50 disabled:cursor-not-allowed disabled:opacity-60" data-i18n="online.buttons.reset"></button>
           </div>
         </div>
 
@@ -110,14 +139,14 @@
 
         <div id="statusContainer" class="mt-12 hidden space-y-8">
           <div>
-            <h3 class="text-2xl font-semibold text-white" data-i18n="online.logs.title"></h3>
-            <div id="logOutput" class="scrollbar-thin mt-4 h-56 overflow-y-auto rounded-2xl border border-white/10 bg-slate-950/70 p-4 text-sm font-mono leading-relaxed text-slate-200 shadow-lg shadow-black/30"></div>
+            <h3 class="text-2xl font-semibold text-slate-900 dark:text-white" data-i18n="online.logs.title"></h3>
+            <div id="logOutput" class="scrollbar-thin mt-4 h-56 overflow-y-auto rounded-2xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-slate-950/70 p-4 text-sm font-mono leading-relaxed text-slate-700 dark:text-slate-200 shadow-lg dark:shadow-black/30"></div>
           </div>
           <div id="resourceTableWrapper" class="hidden">
-            <h3 class="text-2xl font-semibold text-white" data-i18n="online.resources.title"></h3>
-            <div class="mt-4 overflow-hidden rounded-2xl border border-white/10 bg-slate-950/60">
-              <table id="resourceTable" class="min-w-full divide-y divide-white/10 text-left text-sm text-slate-200">
-                <thead class="bg-white/5 text-xs font-semibold uppercase tracking-wide text-slate-300">
+            <h3 class="text-2xl font-semibold text-slate-900 dark:text-white" data-i18n="online.resources.title"></h3>
+            <div class="mt-4 overflow-hidden rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-slate-950/60">
+              <table id="resourceTable" class="min-w-full divide-y divide-slate-200 dark:divide-white/10 text-left text-sm text-slate-700 dark:text-slate-200">
+                <thead class="bg-slate-50 dark:bg-white/5 text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-300">
                 <tr>
                   <th scope="col" class="px-4 py-3" data-i18n="online.resources.headers.type"></th>
                   <th scope="col" class="px-4 py-3" data-i18n="online.resources.headers.original"></th>
@@ -135,33 +164,33 @@
 
     <section class="border-t border-white/10 pt-20">
       <div class="text-center">
-        <h2 class="text-3xl font-semibold text-white sm:text-4xl" data-i18n="features.title"></h2>
-        <p class="mx-auto mt-4 max-w-3xl text-base leading-relaxed text-slate-300" data-i18n="features.subtitle"></p>
+        <h2 class="text-3xl font-semibold text-slate-900 dark:text-white sm:text-4xl" data-i18n="features.title"></h2>
+        <p class="mx-auto mt-4 max-w-3xl text-base leading-relaxed text-slate-600 dark:text-slate-300" data-i18n="features.subtitle"></p>
       </div>
       <div id="featureGrid" class="mt-12 grid gap-8 md:grid-cols-2 lg:grid-cols-3"></div>
     </section>
 
     <section class="border-t border-white/10 pt-20">
       <div class="text-center">
-        <h2 class="text-3xl font-semibold text-white sm:text-4xl" data-i18n="installation.title"></h2>
-        <p class="mx-auto mt-4 max-w-3xl text-base leading-relaxed text-slate-300" data-i18n="installation.subtitle"></p>
+        <h2 class="text-3xl font-semibold text-slate-900 dark:text-white sm:text-4xl" data-i18n="installation.title"></h2>
+        <p class="mx-auto mt-4 max-w-3xl text-base leading-relaxed text-slate-600 dark:text-slate-300" data-i18n="installation.subtitle"></p>
       </div>
       <div id="installationCards" class="mt-12 grid gap-8 lg:grid-cols-2"></div>
     </section>
 
     <section class="border-t border-white/10 pt-20">
       <div class="text-center">
-        <h2 class="text-3xl font-semibold text-white sm:text-4xl" data-i18n="cli.title"></h2>
-        <p class="mx-auto mt-4 max-w-3xl text-base leading-relaxed text-slate-300" data-i18n="cli.subtitle"></p>
+        <h2 class="text-3xl font-semibold text-slate-900 dark:text-white sm:text-4xl" data-i18n="cli.title"></h2>
+        <p class="mx-auto mt-4 max-w-3xl text-base leading-relaxed text-slate-600 dark:text-slate-300" data-i18n="cli.subtitle"></p>
       </div>
       <div class="mt-12 grid gap-8 lg:grid-cols-[1.1fr,0.9fr]">
         <div class="space-y-8" id="cliContent"></div>
-        <div class="rounded-3xl border border-white/10 bg-slate-900/70 p-8 shadow-lg shadow-black/30">
-          <h3 class="text-xl font-semibold text-white" data-i18n="cli.commands.title"></h3>
-          <p class="mt-3 text-sm leading-relaxed text-slate-300" data-i18n="cli.commands.description"></p>
-          <div class="mt-6 overflow-hidden rounded-2xl border border-white/10 bg-slate-950/60">
-            <table class="min-w-full divide-y divide-white/10 text-left text-sm text-slate-200">
-              <thead class="bg-white/5 text-xs font-semibold uppercase tracking-wide text-slate-300">
+        <div class="rounded-3xl border border-slate-200 dark:border-white/10 bg-white dark:bg-slate-900/70 p-8 shadow-lg dark:shadow-black/30">
+          <h3 class="text-xl font-semibold text-slate-900 dark:text-white" data-i18n="cli.commands.title"></h3>
+            <p class="mt-3 text-sm leading-relaxed text-slate-600 dark:text-slate-300" data-i18n="cli.commands.description"></p>
+          <div class="mt-6 overflow-hidden rounded-2xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-slate-950/60">
+            <table class="min-w-full divide-y divide-slate-200 dark:divide-white/10 text-left text-sm text-slate-700 dark:text-slate-200">
+              <thead class="bg-slate-50 dark:bg-white/5 text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-300">
               <tr>
                 <th scope="col" class="px-4 py-3" data-i18n="cli.commands.headers.command"></th>
                 <th scope="col" class="px-4 py-3" data-i18n="cli.commands.headers.description"></th>
@@ -176,47 +205,47 @@
 
     <section class="border-t border-white/10 pt-20">
       <div class="text-center">
-        <h2 class="text-3xl font-semibold text-white sm:text-4xl" data-i18n="ui.title"></h2>
-        <p class="mx-auto mt-4 max-w-3xl text-base leading-relaxed text-slate-300" data-i18n="ui.subtitle"></p>
+        <h2 class="text-3xl font-semibold text-slate-900 dark:text-white sm:text-4xl" data-i18n="ui.title"></h2>
+        <p class="mx-auto mt-4 max-w-3xl text-base leading-relaxed text-slate-600 dark:text-slate-300" data-i18n="ui.subtitle"></p>
       </div>
       <div class="mt-12 grid gap-8 lg:grid-cols-2" id="uiCards"></div>
     </section>
 
     <section class="border-t border-white/10 pt-20">
-      <div class="rounded-3xl border border-white/10 bg-slate-900/70 p-8 shadow-lg shadow-black/30 sm:p-10">
+      <div class="rounded-3xl border border-slate-200 dark:border-white/10 bg-white dark:bg-slate-900/70 p-8 shadow-lg dark:shadow-black/30 sm:p-10">
         <div class="grid gap-8 lg:grid-cols-[0.85fr,1.15fr] lg:items-start">
           <div>
-            <h2 class="text-3xl font-semibold text-white sm:text-4xl" data-i18n="output.title"></h2>
-            <p class="mt-4 text-base leading-relaxed text-slate-300" data-i18n="output.subtitle"></p>
+            <h2 class="text-3xl font-semibold text-slate-900 dark:text-white sm:text-4xl" data-i18n="output.title"></h2>
+            <p class="mt-4 text-base leading-relaxed text-slate-600 dark:text-slate-300" data-i18n="output.subtitle"></p>
           </div>
-          <pre class="scrollbar-thin overflow-x-auto rounded-2xl border border-slate-700/60 bg-slate-950/70 p-5 text-sm leading-relaxed text-slate-200 font-mono"><code data-i18n-code="output.structure"></code></pre>
+          <pre class="scrollbar-thin overflow-x-auto rounded-2xl border border-slate-300 dark:border-slate-700/60 bg-slate-50 dark:bg-slate-950/70 p-5 text-sm leading-relaxed text-slate-700 dark:text-slate-200 font-mono"><code data-i18n-code="output.structure"></code></pre>
         </div>
       </div>
     </section>
 
     <section class="border-t border-white/10 pt-20">
-      <div class="rounded-3xl border border-white/10 bg-slate-900/70 p-8 shadow-lg shadow-black/30 sm:p-10">
-        <h2 class="text-3xl font-semibold text-white sm:text-4xl" data-i18n="tips.title"></h2>
+      <div class="rounded-3xl border border-slate-200 dark:border-white/10 bg-white dark:bg-slate-900/70 p-8 shadow-lg dark:shadow-black/30 sm:p-10">
+        <h2 class="text-3xl font-semibold text-slate-900 dark:text-white sm:text-4xl" data-i18n="tips.title"></h2>
         <div class="mt-8 grid gap-8 lg:grid-cols-3" id="tipsGrid"></div>
       </div>
     </section>
 
     <section class="border-t border-white/10 pt-20">
-      <div class="rounded-3xl border border-white/10 bg-slate-900/70 p-8 shadow-lg shadow-black/30 sm:p-10">
+      <div class="rounded-3xl border border-slate-200 dark:border-white/10 bg-white dark:bg-slate-900/70 p-8 shadow-lg dark:shadow-black/30 sm:p-10">
         <div class="grid gap-8 lg:grid-cols-2">
           <div>
-            <h3 class="text-xl font-semibold text-white" data-i18n="links.contribute.title"></h3>
-            <p class="mt-3 text-sm leading-relaxed text-slate-300" data-i18n="links.contribute.description"></p>
+            <h3 class="text-xl font-semibold text-slate-900 dark:text-white" data-i18n="links.contribute.title"></h3>
+            <p class="mt-3 text-sm leading-relaxed text-slate-600 dark:text-slate-300" data-i18n="links.contribute.description"></p>
             <a href="https://github.com/YangsonHung/html-assets-localizer" target="_blank" rel="noopener noreferrer" class="mt-6 inline-flex items-center rounded-full border border-white/20 px-5 py-2 text-sm font-semibold text-white transition hover:border-white hover:bg-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white" data-i18n="links.contribute.cta"></a>
           </div>
           <div class="space-y-6">
             <div>
-              <h3 class="text-xl font-semibold text-white" data-i18n="links.resources.title"></h3>
-              <ul class="mt-3 space-y-2 text-sm text-slate-300" id="resourceLinks"></ul>
+              <h3 class="text-xl font-semibold text-slate-900 dark:text-white" data-i18n="links.resources.title"></h3>
+              <ul class="mt-3 space-y-2 text-sm text-slate-600 dark:text-slate-300" id="resourceLinks"></ul>
             </div>
             <div>
-              <h3 class="text-xl font-semibold text-white" data-i18n="links.license.title"></h3>
-              <p class="mt-3 text-sm leading-relaxed text-slate-300" data-i18n="links.license.description"></p>
+              <h3 class="text-xl font-semibold text-slate-900 dark:text-white" data-i18n="links.license.title"></h3>
+              <p class="mt-3 text-sm leading-relaxed text-slate-600 dark:text-slate-300" data-i18n="links.license.description"></p>
             </div>
           </div>
         </div>
@@ -224,12 +253,12 @@
     </section>
   </main>
 
-  <footer class="border-t border-white/10 bg-slate-950/80">
-    <div class="mx-auto flex max-w-6xl flex-col gap-8 px-6 py-10 text-sm text-slate-300 sm:px-10 sm:text-base lg:flex-row lg:items-center lg:justify-between">
+  <footer class="border-t border-slate-200 dark:border-white/10 bg-white dark:bg-slate-950/80">
+    <div class="mx-auto flex max-w-6xl flex-col gap-8 px-6 py-10 text-sm text-slate-600 dark:text-slate-300 sm:px-10 sm:text-base lg:flex-row lg:items-center lg:justify-between">
       <div>
         <p data-i18n="footer.summary"></p>
       </div>
-      <div class="text-xs text-slate-500 sm:text-sm" data-i18n="footer.copyright"></div>
+      <div class="text-xs text-slate-400 dark:text-slate-500 sm:text-sm" data-i18n="footer.copyright"></div>
     </div>
   </footer>
 </div>

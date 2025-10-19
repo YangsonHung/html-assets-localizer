@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## 1.3.0 - 2025-10-19
+
+- improve light theme adaptation for better visibility
+- fix language switching issues where Chinese text persisted in English mode
+- implement custom file upload button with better styling and functionality
+- update documentation text to remove README references and improve clarity
+- enhance UI elements for better user experience across themes
+
 ## 1.2.1 - 2025-10-18
 
 - update docs/index.html
